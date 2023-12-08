@@ -44,6 +44,7 @@ int main()
     std::list<Entity*> enemies; //список врагов
     std::list<Entity*> Bullets; //список пуль
     std::list<Entity*>::iterator it; //итератор чтобы проходить по элементам списка
+    std::list<Entity*>::iterator it2; //итератор чтобы проходить по элементам списка
 
     int enemiesCount = 0; //текущее количество врагов в игре
 
@@ -59,6 +60,7 @@ int main()
 
     int createObjectForMapTimer = 0;//Переменная под время для генерирования камней
     int shotTimer = 0;
+    int enemiesTimer = 0;
 
     while (window.isOpen())
     {
@@ -68,9 +70,23 @@ int main()
 
         createObjectForMapTimer += time;//наращиваем таймер
         shotTimer += time;
+
         if (createObjectForMapTimer>3000){
             createObjectForMapTimer = 0;//обнуляем таймер
         }
+
+        if(enemiesCount < ENEMY_COUNT){
+            enemiesTimer += time;
+            if(enemiesTimer > 300){
+                float xr = 150 + rand() % 500; // случайная координата врага на поле игры по оси “x”
+                float yr = 150 + rand() % 350; // случайная координата врага на поле игры по оси “y”
+                //создаем врагов и помещаем в список
+                enemies.push_back(new Enemy(easyEnemyImage, xr, yr, 96, 96, "EasyEnemy"));
+                enemiesCount += 1; //увеличили счётчик врагов
+                enemiesTimer = 0;
+            }
+        }
+
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -119,6 +135,19 @@ int main()
                 }
             }
         }
+        //Проверка пересечения пуль с врагами
+        //Если пересечение произошло, то "health = 0", игрок обездвижевается и
+        //выводится сообщение "you are lose"
+        for ( it2 = Bullets.begin(); it2 != Bullets.end(); it2++){//бежим по списку пуль
+            for (it = enemies.begin(); it != enemies.end(); it++){//бежим по списку врагов
+                if (((*it)->getRect().intersects((*it2)->getRect())) && ((*it)->name == "EasyEnemy") && ((*it2)->name == "Bullet"))
+                {
+                    Bullets.erase(it2);
+                    enemies.erase(it);
+                    enemiesCount--;
+                }
+            }
+       }
         window.clear();
 
         /////////////////////////////Рисуем карту/////////////////////
