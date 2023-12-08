@@ -23,7 +23,7 @@ int main()
     text.setStyle(Text::Bold);//жирный текст.
 
     Image map_image;//объект изображения для карты
-    map_image.loadFromFile("images/map_new.png");//загружаем файл для карты
+    map_image.loadFromFile("images/fon.png");//загружаем файл для карты
     Texture map;//текстура карты
 
     map.loadFromImage(map_image);//заряжаем текстуру картинкой
@@ -33,12 +33,12 @@ int main()
     Clock clock;
 
     Image heroImage;
-    heroImage.loadFromFile("images/hero.png"); // загружаем изображение игрока
+    heroImage.loadFromFile("images/spaceship.png"); // загружаем изображение игрока
     Image easyEnemyImage;
-    easyEnemyImage.loadFromFile("images/enemy.png"); // загружаем изображение врага
+    easyEnemyImage.loadFromFile("images/enemyspace.png"); // загружаем изображение врага
 
     Image BulletImage;//изображение для пули
-    BulletImage.loadFromFile("images/bullet.png");//загрузили картинку в объект изображения
+    BulletImage.loadFromFile("images/plazmabullet.png");//загрузили картинку в объект изображения
     Player p(heroImage, 96, 96, "Player1");//объект класса игрока
 
     std::list<Entity*> enemies; //список врагов
@@ -120,7 +120,9 @@ int main()
             }
         }
         window.clear();
+
         /////////////////////////////Рисуем карту/////////////////////
+        window.draw(s_map);
         //объявили переменную здоровья и времени
         window.draw(p.sprite);//рисуем спрайт объекта “p” класса “Player”
         //рисуем врагов

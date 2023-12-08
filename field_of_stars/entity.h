@@ -14,7 +14,6 @@ public:
     bool life; //переменная “life” жизнь, логическая
     Texture texture;//сфмл текстура
     Sprite sprite;//сфмл спрайт
-    float CurrentFrame;//хранит текущий кадр
     std::string name;//враги могут быть разные, врагов можно различать по именам
 
     Entity(Image &image, float X, float Y, int W, int H, std::string Name);
