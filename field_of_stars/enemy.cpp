@@ -10,6 +10,7 @@ Enemy::Enemy(Image &image, float X, float Y, int W, int H, std::string Name) :En
         //через генератор случайных чисел
         speed = 0.1;//даем скорость.этот объект всегда двигается
         dx = speed;
+        enemiesBulletsTimer = (rand() % 1000);
     }
 }
 
@@ -37,6 +38,11 @@ void Enemy::checkCollisionWithBounds()//ф-ция проверки столкн�
     }
 }
 
+Bullet *Enemy::strike(Image& BulletImage)
+{
+    return new Bullet(BulletImage, x + (w/2) - 16, y - 16, 16, 16, "Bullet", down);
+}
+
 void Enemy::update(float time)
 {
     if (name == "EasyEnemy"){//для персонажа с таким именем логика будет такой
@@ -60,6 +66,7 @@ void Enemy::update(float time)
                 break;
             }
             }
+            enemiesBulletsTimer += (time + ((float)(rand() % 100))/100);
             x += dx*time; //движение по “X”
             //обрабатываем столкновение по Х
             y += dy*time; //движение по “Y”

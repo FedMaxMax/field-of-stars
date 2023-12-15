@@ -43,8 +43,10 @@ int main()
 
     std::list<Entity*> enemies; //список врагов
     std::list<Entity*> Bullets; //список пуль
+    std::list<Entity*> enemyBullets; //список вражеских пуль
     std::list<Entity*>::iterator it; //итератор чтобы проходить по элементам списка
     std::list<Entity*>::iterator it2; //итератор чтобы проходить по элементам списка
+    Enemy *pointEnemy;
 
     int enemiesCount = 0; //текущее количество врагов в игре
 
@@ -108,10 +110,20 @@ int main()
         for (it = enemies.begin(); it != enemies.end(); it++)
         {
             (*it)->update(time); //запускаем метод update()
+            pointEnemy = ((Enemy*)(*it));
+            if (pointEnemy->enemiesBulletsTimer > 2000)
+                {
+                pointEnemy->enemiesBulletsTimer = 0;
+                enemyBullets.push_back(pointEnemy->strike(BulletImage));
+                }
         }
 
         //оживляем пули
         for (it = Bullets.begin(); it != Bullets.end(); it++)
+        {
+            (*it)->update(time); //запускаем метод update()
+        }
+        for (it = enemyBullets.begin(); it != enemyBullets.end(); it++)
         {
             (*it)->update(time); //запускаем метод update()
         }
@@ -120,6 +132,13 @@ int main()
         for (it = Bullets.begin(); it != Bullets.end(); )//говорим что проходимся от начала до конца
         {// если этот объект мертв, то удаляем его
             if ((*it)-> life == false) { it = Bullets.erase(it); }
+            else it++;//и идем курсором (итератором) к след объекту.
+        }
+
+        //Проверяем список на наличие "мертвых" вражеских пуль и удаляем их
+        for (it = enemyBullets.begin(); it != enemyBullets.end(); )//говорим что проходимся от начала до конца
+        {// если этот объект мертв, то удаляем его
+            if ((*it)-> life == false) { it = enemyBullets.erase(it); }
             else it++;//и идем курсором (итератором) к след объекту.
         }
 
@@ -148,6 +167,19 @@ int main()
                 }
             }
        }
+
+        //Проверка пересечения вражеских пуль с игроком
+        //Если пересечение произошло, то "health = 0", игрок обездвижевается и
+        //выводится сообщение "you are lose"
+        if (p.life == true){//если игрок жив
+            for (it = enemyBullets.begin(); it != enemyBullets.end(); it++){//бежим по списку врагов
+                if (p.getRect().intersects((*it)->getRect()))
+                {
+                    p.health = 0;
+                    std::cout << "you are lose";
+                }
+            }
+        }
         window.clear();
 
         /////////////////////////////Рисуем карту/////////////////////
@@ -162,6 +194,11 @@ int main()
         }
         //рисуем пули
         for (it = Bullets.begin(); it != Bullets.end(); it++)
+        {
+            if ((*it)->life) //если пули живы
+                window.draw((*it)->sprite); //рисуем объекты
+        }
+        for (it = enemyBullets.begin(); it != enemyBullets.end(); it++)
         {
             if ((*it)->life) //если пули живы
                 window.draw((*it)->sprite); //рисуем объекты

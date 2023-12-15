@@ -2,13 +2,14 @@
 #define ENTITY_H
 
 #include <SFML/Graphics.hpp>
+#include "global.h"
 
 using namespace sf;
 
 ////////////////////////////КЛАСС СУЩНОСТЬ////////////////////////
 class Entity {
 public:
-    enum { left, right, up, down, stay} state;// тип перечисления - состояние объекта
+    StateObject state;// тип перечисления - состояние объекта
     float dx, dy, x, y, speed, moveTimer;//добавили переменную таймер для будущих целей
     int w, h, health; //переменная “health”, хранящая жизни игрока
     bool life; //переменная “life” жизнь, логическая
