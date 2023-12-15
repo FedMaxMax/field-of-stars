@@ -7,7 +7,7 @@
 ////////////////////////////КЛАСС ПУЛИ////////////////////////
 class Bullet :public Entity{//класс пули
 public:
-    Bullet(Image &image, float X, float Y, int W, int H, std::string Name);
+    Bullet(Image &image, float X, float Y, int W, int H, std::string Name, StateObject State);
     void update(float time);
 };
 

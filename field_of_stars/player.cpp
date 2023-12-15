@@ -28,7 +28,7 @@ void Player::control(){
 
 Bullet *Player::strike(Image& BulletImage)
 {
-    return new Bullet(BulletImage, x + (w/2) - 16, y - 16, 16, 16, "Bullet");
+    return new Bullet(BulletImage, x + (w/2) - 16, y - 16, 16, 16, "Bullet", up);
 }
 
 void Player::update(float time) //метод "оживления/обновления" объекта класса.
