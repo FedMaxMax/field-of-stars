@@ -1,78 +1,110 @@
 #include "enemy.h"
+#include <cmath>
+#include "global.h"
 
-Enemy::Enemy(Image &image, float X, float Y, int W, int H, std::string Name) :Entity(image, X,
-                                                                              Y, W, H, Name){
-    if (name == "EasyEnemy"){
-        //Задаем спрайту один прямоугольник для
-        //вывода одного игрока. IntRect – для приведения типов
-        sprite.setTextureRect(IntRect(0, 0, w, h));
-        direction = rand() % (3); //Направление движения врага задаём случайным образом
-        //через генератор случайных чисел
-        speed = 0.1;//даем скорость.этот объект всегда двигается
-        dx = speed;
-        enemiesBulletsTimer = (rand() % 1000);
+Enemy::Enemy(sf::Image &p_image, sf::Image &p_bulletImage, uint16_t p_w, uint16_t p_h, std::string p_type)
+    : Unit(p_image, p_bulletImage, rand()%(SCREEN_W - p_w - 20) + 10, rand()%(SCREEN_H - p_h - 220) + 10, p_w, p_h, 50, 1200)
+{
+    m_type = p_type;
+    m_cost = 100;
+    m_speed = 0.15;
+    m_dir = rand()%360; // Случайный начальный угол
+
+    if(m_dir > 45 && m_dir <= 90) // Уменьшаем угол, если он слишком крутой
+        m_dir = 45;
+    if(m_dir > 90 && m_dir <= 135)
+        m_dir = 135;
+    if(m_dir < -45 && m_dir >= -90)
+        m_dir = -45;
+    if(m_dir < 90 && m_dir >= 135)
+        m_dir = -135;
+
+    m_dx = m_speed * cos((float)m_dir/180 * PI);
+    m_dy = -m_speed * sin((float)m_dir/180 * PI);
+
+    if(m_type == "threebullet")
+    {
+        m_cost = 150;
+        m_shootTime = 1500;
+        getSprite()->setColor(Color::Yellow);
+    } else
+    if(m_type == "strong")
+    {
+        m_cost = 200;
+        m_shootTime = 1000;
+        m_speed = 0.2;
+        setHealth(100);
+        getSprite()->setColor(Color::Red);
     }
+
+    m_shootTimer = rand()%m_shootTime; // Задаем случайное начальное значение для таймера
+    // чтобы враги не стреляли одновременно
 }
 
-void Enemy::checkCollisionWithBounds()//ф-ция проверки столкновений с картой
+void Enemy::shoot(std::list<Bullet *> &p_bulletList)
 {
-    if (x <= 10){
-        x = 15;
-        dx = 0.1;
-        direction = rand() % (3);
-    }
-    if (y <= 10){
-        y = 15;
-        dy = 0.1;
-        direction = rand() % (3);
-    }
-    if (x + w >= 790){
-        x = 785 - w;
-        dx = -0.1;
-        direction = rand() % (3);
-    }
-    if (y + h >= 430){
-        y = 425 - h;
-        dy = -0.1;
-        direction = rand() % (3);
-    }
+    if(m_type == "threebullet")
+    {
+        p_bulletList.push_back(new Bullet(m_bulletImage, -60, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+        p_bulletList.push_back(new Bullet(m_bulletImage, -120, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+    } else
+    if(m_type == "strong")
+        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.5f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 30));
+    else
+        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.45f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 20));
 }
 
-Bullet *Enemy::strike(Image& BulletImage)
+void Enemy::update()
 {
-    return new Bullet(BulletImage, x + (w/2) - 16, y - 16, 16, 16, "Bullet", down);
-}
+    if(isAlive())
+    {
+        bool angleChanged = false; // Объявляем флаг изменения направления чтобы пересчитывать
+                                   // скорости только когда направление меняется
 
-void Enemy::update(float time)
-{
-    if (name == "EasyEnemy"){//для персонажа с таким именем логика будет такой
-        if (life) {//проверяем, жив ли герой
-            switch (direction)//делаются различные действия в зависимости от состояния
-            {
-            case 0:{//состояние идти вправо
-                dx = speed;
-                break;
-            }
-            case 1:{//состояние идти влево
-                dx = -speed;
-                break;
-            }
-            case 2:{//идти вверх
-                dy = -speed;
-                break;
-            }
-            case 3:{//идти вниз
-                dy = speed;
-                break;
-            }
-            }
-            enemiesBulletsTimer += (time + ((float)(rand() % 100))/100);
-            x += dx*time; //движение по “X”
-            //обрабатываем столкновение по Х
-            y += dy*time; //движение по “Y”
-            checkCollisionWithBounds();//обрабатываем столкновение по Y
-            sprite.setPosition(x, y); //спрайт в позиции (x, y).
-            if (health <= 0){ life = false; }//если жизней меньше 0, либо равно 0, то умираем
+        if (m_x <= 10){ // Столкновение с левой границей
+            m_x = 10;
+            m_dir = 180 - m_dir + (rand()% 10 - 5); // Изменяем направление движения
+            angleChanged = true;
+        }
+        if (m_y <= 10){ // Столкновение с верхней границей
+            m_y = 10;
+            m_dir = - m_dir + (rand()% 10 - 5);
+            angleChanged = true;
+        }
+        if (m_x + m_w >= SCREEN_W - 10){ // Столкновение с правой границей
+            m_x = SCREEN_W - 10 - m_w;
+            m_dir = 180 - m_dir + (rand()% 10 - 5);
+            angleChanged = true;
+        }
+        if (m_y + m_h >= SCREEN_H-210){ // Столкновение с нижней границей
+            m_y = SCREEN_H - 210 - m_h;
+            m_dir = - m_dir + (rand()% 10 - 5);
+            angleChanged = true;
+        }
+
+        if(angleChanged)
+        {
+            if(m_dir >=  360) m_dir -= 360;
+            if(m_dir <= -360) m_dir += 360;
+
+            if(m_dir > 45 && m_dir <= 90) // Уменьшаем угол, если он становится слишком крутым
+                m_dir = 45;
+            if(m_dir > 90 && m_dir <= 135)
+                m_dir = 135;
+            if(m_dir < -45 && m_dir >= -90)
+                m_dir = -45;
+            if(m_dir < 90 && m_dir >= 135)
+                m_dir = -135;
+
+            m_dx = m_speed * cos((float)m_dir/180 * PI);
+            m_dy = -m_speed * sin((float)m_dir/180 * PI);
         }
     }
 }
+
+uint16_t Enemy::getCost()
+{
+    return m_cost;
+}
+

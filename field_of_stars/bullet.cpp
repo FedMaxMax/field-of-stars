@@ -1,31 +1,22 @@
 #include "bullet.h"
+#include <cmath>
+#include "global.h"
 
-Bullet::Bullet(Image &image, float X, float Y, int W, int H, std::string Name, StateObject State)
-    :Entity(image, X, Y, W, H, Name){
-    x = X;
-    y = Y;
-    speed = 0.8;
-    w = h = 16;
-    life = true;
-    state = State;
-    //выше инициализация в конструкторе
+Bullet::Bullet(Image &p_image, uint16_t p_dir, float p_speed, float p_x, float p_y, uint16_t p_w, uint16_t p_h,  uint16_t p_damage)
+    :Entity(p_image, p_x, p_y, p_w, p_h) // Вызываем конструктор базового класса
+{
+    m_speed = p_speed;
+    m_dir = p_dir;
+    m_dx = m_speed * cos((float)m_dir/180 * PI);
+    m_dy = -m_speed * sin((float)m_dir/180 * PI);
+    rotate((float)m_dir/180 * PI);
+
+    setCollisionDamage(p_damage);
 }
 
-void Bullet::update(float time)
+void Bullet::update()
 {
-    if (life){
-        switch (state)
-            {
-            case up:
-                dy = -speed;
-                break;
-            case down:
-                dy = speed;
-            }
-        y += dy*time;//по у
-        if (y <= 0 || y >= SCREEN_H){
-            life = false;
-        }
-        sprite.setPosition(x + w / 2, y + h / 2);//задается позицию пули
+    if (m_x <= 0 || m_x >= SCREEN_W || m_y <= 0 || m_y >= SCREEN_H){
+        die();
     }
 }

@@ -1,17 +1,30 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#include "entity.h"
+#include <SFML/Graphics.hpp>
+#include <string>
+#include "unit.h"
 #include "bullet.h"
 
-////////////////////////////КЛАСС ВРАГА////////////////////////
-class Enemy :public Entity{
+using namespace sf;
+
+/*
+ * Класс Enemy описывает юнит, который передвигается по экрану
+ * и стреляет без участия игрока
+ */
+
+class Enemy :public Unit{
+private:
+    std::string m_type;
+    uint16_t m_cost;
+
+protected:
+    virtual void shoot(std::list<Bullet*>& p_bulletList); // Используется лист, так как пуль может быть несколько
+
 public:
-    int enemiesBulletsTimer;
-    int direction;//направление движения врага
-    Enemy(Image &image, float X, float Y, int W, int H, std::string Name);
-    void checkCollisionWithBounds();//ф-ция проверки столкновений с картой
-    void update(float time);
-    Bullet* strike(Image& BulletImage);
-};//класс Enemy закрыт
+    Enemy(Image &p_image, Image &p_bulletImage, uint16_t p_w, uint16_t p_h, std::string p_type);
+    void update(); // Эта функция отвечает за изменение скорости и направления движения
+                   // Определяет траекторию движения объекта
+    uint16_t getCost();
+};
 #endif // ENEMY_H
