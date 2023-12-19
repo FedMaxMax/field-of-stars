@@ -20,7 +20,8 @@ SOURCES += main.cpp \
     enemy.cpp \
     bullet.cpp \
     unit.cpp \
-    playership.cpp
+    playership.cpp \
+    battlescreen.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
@@ -31,5 +32,6 @@ HEADERS += \
     entity.h \
     global.h \
     unit.h \
-    playership.h
+    playership.h \
+    battlescreen.h
 
