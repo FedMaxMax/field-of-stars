@@ -19,21 +19,11 @@ Font BattleScreen::createFont()
     return font;
 }
 
-void BattleScreen::control()
-{
-    sf::Event event;
-    while (window.pollEvent(event))
-    {
-        if (event.type == sf::Event::Closed)
-            window.close();
 
-        while (Keyboard::isKeyPressed(Keyboard::P)) // Останавливаем если нажата клавиша P
-            clock.restart();
-    }
-}
-
-void BattleScreen::updateObjects(float p_time, PlayerShip p_player, std::list<Bullet*> p_plBullets, std::list<Enemy*> p_enemies, std::list<Bullet*> p_enBullets)
+void BattleScreen::updateObjects(float& p_time, PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets)
 {
+    std::list<Bullet*>::iterator itBul;
+    std::list<Enemy*>::iterator itEn;
     for (itBul = p_enBullets.begin(); itBul != p_enBullets.end(); itBul++) // Обновляем пули. Должно быть перед обновлением врагов
                                                                    // и игрока, так как они могут создать новые!
     {
@@ -59,8 +49,10 @@ void BattleScreen::updateObjects(float p_time, PlayerShip p_player, std::list<Bu
     }
 }
 
-void collisionCheck(PlayerShip p_player, std::list<Bullet*> p_plBullets, std::list<Enemy*> p_enemies, std::list<Bullet*> p_enBullets)
+void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets)
 {
+    std::list<Bullet*>::iterator itBul;
+    std::list<Enemy*>::iterator itEn;
     for(itBul = p_enBullets.begin(); itBul != p_enBullets.end(); itBul++) // Проверяем столкновение пуль с игроком
     {
         if(p_player.getRect().intersects((*itBul)->getRect()))
@@ -89,8 +81,10 @@ void collisionCheck(PlayerShip p_player, std::list<Bullet*> p_plBullets, std::li
     }
 }
 
-void BattleScreen::draw(Window p_window,PlayerShip p_player, std::list<Bullet*> p_plBullets, std::list<Enemy*> p_enemies, std::list<Bullet*> p_enBullets)
+void BattleScreen::draw(RenderWindow& p_window,PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets)
 {
+    std::list<Bullet*>::iterator itBul;
+    std::list<Enemy*>::iterator itEn;
     for(itBul = p_enBullets.begin(); itBul != p_enBullets.end(); itBul++) // Рисуем вражеские пули (удаляем если уничтожены)
     {
         if((*itBul)->isAlive())
@@ -158,10 +152,9 @@ void BattleScreen::play()
 
     std::list<Bullet*> enBullets; // Список вражеских пуль
     std::list<Bullet*> plBullets; // Список пуль игрока
-    std::list<Bullet*>::iterator itBul;
 
     std::list<Enemy*> enemies; // Список пуль
-    std::list<Enemy*>::iterator itEn;
+
 
     enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
     enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "strong"));
@@ -173,7 +166,15 @@ void BattleScreen::play()
         clock.restart();
         time = time/1000;
 
-        control();
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+
+            while (Keyboard::isKeyPressed(Keyboard::P)) // Останавливаем если нажата клавиша P
+                clock.restart();
+        }
 
         updateObjects(time, player, plBullets, enemies, enBullets);
 

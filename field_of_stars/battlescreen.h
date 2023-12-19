@@ -22,9 +22,9 @@ class BattleScreen
 private:
 
     Font createFont();
-    void control();
-    void updateObjects(float p_time, PlayerShip p_player, std::list<Bullet*> p_plBullets, std::list<Enemy*> p_enemies, std::list<Bullet*> p_enBullets);
-    void collisionCheck(PlayerShip p_player, std::list<Bullet*> p_plBullets, std::list<Enemy*> p_enemies, std::list<Bullet*> p_enBullets);
+    void updateObjects(float& p_time, PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets);
+    void collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets);
+    void draw(RenderWindow& p_window,PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets);
 public:
     void play();
 
