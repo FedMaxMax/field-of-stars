@@ -3,7 +3,7 @@
 
 const float PI = 3.1415926536;
 
-const int ENEMY_COUNT = 3; //максимальное количество врагов в игре
+const int ENEMY_COUNT = 5; //максимальное количество врагов в игре
 const int SCREEN_W = 800;
 const int SCREEN_H = 640;
 

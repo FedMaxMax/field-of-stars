@@ -122,6 +122,38 @@ void BattleScreen::draw(RenderWindow& p_window,PlayerShip& p_player, std::list<B
     p_window.draw(*(p_player.getSprite())); // Рисуем игрока
 }
 
+void BattleScreen::respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Image p_enemyImage, Image p_bulletImage)
+{
+    uint16_t enType;
+    static float respawnTimer = 0;
+    if (p_enemies.size() < ENEMY_COUNT)
+    {
+        respawnTimer+= p_time;
+        if(respawnTimer > 2500)
+        {
+            enType = rand() % 10 + 1;
+            if (enType <= 5)
+                {
+                p_enemies.push_back(new Enemy(p_enemyImage, p_bulletImage, 96, 96, "common"));
+                respawnTimer = 0;
+                }
+
+            else if ((enType > 5) && (enType < 9))
+                {
+                p_enemies.push_back(new Enemy(p_enemyImage, p_bulletImage, 96, 96, "strong"));
+                respawnTimer = 0;
+                }
+
+            else if (enType >= 9)
+                {
+                p_enemies.push_back(new Enemy(p_enemyImage, p_bulletImage, 96, 96, "threebullet"));
+                respawnTimer = 0;
+                }
+
+        }
+    }
+}
+
 void BattleScreen::play()
 {
 
@@ -157,8 +189,11 @@ void BattleScreen::play()
 
 
     enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
-    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "strong"));
-    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "threebullet"));
+    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
+    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
+    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
+    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
+
 
     while (window.isOpen())
     {
@@ -175,6 +210,8 @@ void BattleScreen::play()
             while (Keyboard::isKeyPressed(Keyboard::P)) // Останавливаем если нажата клавиша P
                 clock.restart();
         }
+
+        respawnEnemy(time, enemies, enemyImage, bulletImage);
 
         updateObjects(time, player, plBullets, enemies, enBullets);
 
