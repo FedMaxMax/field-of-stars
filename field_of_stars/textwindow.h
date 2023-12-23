@@ -1,5 +1,5 @@
-#ifndef TEXTWINDOW_H
-#define TEXTWINDOW_H
+#ifndef TEXTWINDOW_H_
+#define TEXTWINDOW_H_
 
 #include <stdint.h>
 #include <SFML/Graphics.hpp>

@@ -1,5 +1,5 @@
-#ifndef UNIT_H
-#define UNIT_H
+#ifndef UNIT_H_
+#define UNIT_H_
 
 #include <SFML/Graphics.hpp>
 #include <stdint.h>

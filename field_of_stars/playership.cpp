@@ -2,7 +2,7 @@
 #include <iostream>
 
 PlayerShip::PlayerShip(Image &p_image, Image &p_bulletImage, float p_x, float p_y, uint16_t p_w, uint16_t p_h)
-    : Unit(p_image, p_bulletImage, p_x, p_y, p_w, p_h, 100, 400)
+    : Unit(p_image, p_bulletImage, p_x, p_y, p_w, p_h, 100, 300)
 {
     m_playerScore = 0;
     m_speed = 0.4;
@@ -10,7 +10,7 @@ PlayerShip::PlayerShip(Image &p_image, Image &p_bulletImage, float p_x, float p_
 
 void PlayerShip::shoot(std::list<Bullet *>& p_bulletList)
 {
-    p_bulletList.push_back(new Bullet(m_bulletImage, 90, 0.6f, m_x + (m_w/2) - 8, m_y - 16, 16, 16, 50));
+    p_bulletList.push_back(new Bullet(m_bulletImage, 90, 0.6f, m_x + (m_w/2) - BULLET_W/2, m_y - BULLET_H, BULLET_W, BULLET_H, 50));
 }
 
 void PlayerShip::increaseShootTimer(float p_time, std::list<Bullet*>& p_bulletList)

@@ -1,5 +1,5 @@
-#ifndef ENEMY_H
-#define ENEMY_H
+#ifndef ENEMY_H_
+#define ENEMY_H_
 
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -7,6 +7,9 @@
 #include "bullet.h"
 
 using namespace sf;
+
+const int ENEMY_W  = 64;
+const int ENEMY_H  = 64;
 
 /*
  * Класс Enemy описывает юнит, который передвигается по экрану

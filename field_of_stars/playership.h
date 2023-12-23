@@ -1,5 +1,5 @@
-#ifndef PLAYER_H
-#define PLAYER_H
+#ifndef PLAYER_H_
+#define PLAYER_H_
 
 #include <SFML/Graphics.hpp>
 #include <stdint.h>
@@ -8,6 +8,9 @@
 #include "unit.h"
 
 using namespace sf;
+
+const int PLAYER_W = 64;
+const int PLAYER_H = 64;
 
 /*
  * Класс PlayerShip описывает юнит, который находится под управлением игрока

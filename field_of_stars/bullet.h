@@ -1,9 +1,12 @@
-#ifndef BULLET_H
-#define BULLET_H
+#ifndef BULLET_H_
+#define BULLET_H_
 
 #include <SFML/Graphics.hpp>
 #include <stdint.h>
 #include "entity.h"
+
+const int BULLET_W = 16;
+const int BULLET_H = 16;
 
 /*
  * Класс Bullet описывает снаряды

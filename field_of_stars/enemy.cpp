@@ -3,7 +3,7 @@
 #include "global.h"
 
 Enemy::Enemy(sf::Image &p_image, sf::Image &p_bulletImage, uint16_t p_w, uint16_t p_h, std::string p_type)
-    : Unit(p_image, p_bulletImage, rand()%(SCREEN_W - p_w - 20) + 10, rand()%(SCREEN_H - p_h - 220) + 10, p_w, p_h, 50, 1200)
+    : Unit(p_image, p_bulletImage, rand()%(SCREEN_W - p_w - 20) + 10, rand()%(SCREEN_H - p_h - 220) + 10, p_w, p_h, 50, 2000)
 {
     m_type = p_type;
     m_cost = 100;
@@ -26,7 +26,6 @@ Enemy::Enemy(sf::Image &p_image, sf::Image &p_bulletImage, uint16_t p_w, uint16_
     {
         m_cost = 150;
         m_shootTime = 1500;
-        getSprite()->setColor(Color::Yellow);
     } else
     if(m_type == "strong")
     {
@@ -34,7 +33,6 @@ Enemy::Enemy(sf::Image &p_image, sf::Image &p_bulletImage, uint16_t p_w, uint16_
         m_shootTime = 1000;
         m_speed = 0.2;
         setHealth(100);
-        getSprite()->setColor(Color::Red);
     }
 
     m_shootTimer = rand()%m_shootTime; // Задаем случайное начальное значение для таймера
@@ -45,14 +43,14 @@ void Enemy::shoot(std::list<Bullet *> &p_bulletList)
 {
     if(m_type == "threebullet")
     {
-        p_bulletList.push_back(new Bullet(m_bulletImage, -60, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
-        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
-        p_bulletList.push_back(new Bullet(m_bulletImage, -120, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+        p_bulletList.push_back(new Bullet(m_bulletImage, -60, 0.3f, m_x + (m_w/2) - 8, m_y + m_h, BULLET_W, BULLET_H, 15));
+        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.3f, m_x + (m_w/2) - 8, m_y + m_h, BULLET_W, BULLET_H, 15));
+        p_bulletList.push_back(new Bullet(m_bulletImage, -120, 0.3f, m_x + (m_w/2) - 8, m_y + m_h, BULLET_W, BULLET_H, 15));
     } else
     if(m_type == "strong")
-        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.5f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 30));
+        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.5f, m_x + (m_w/2) - 8, m_y + m_h, BULLET_W, BULLET_H, 30));
     else
-        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.45f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 20));
+        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.35f, m_x + (m_w/2) - 8, m_y + m_h, BULLET_W, BULLET_H, 20));
 }
 
 void Enemy::update()

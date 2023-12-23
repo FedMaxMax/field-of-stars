@@ -1,5 +1,5 @@
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#ifndef GLOBAL_H_
+#define GLOBAL_H_
 
 const float PI = 3.1415926536;
 

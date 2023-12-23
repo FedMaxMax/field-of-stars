@@ -122,31 +122,32 @@ void BattleScreen::draw(RenderWindow& p_window,PlayerShip& p_player, std::list<B
     p_window.draw(*(p_player.getSprite())); // Рисуем игрока
 }
 
-void BattleScreen::respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Image p_enemyImage, Image p_bulletImage)
+void BattleScreen::respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Image p_enemyCommonImage, Image p_enemyThreeBulletImage, Image p_enemyStrongImage,
+                                Image p_bulletCommonImage, Image p_bulletThreeBulletImage, Image p_bulletStrongImage)
 {
     uint16_t enType;
     static float respawnTimer = 0;
     if (p_enemies.size() < ENEMY_COUNT)
     {
         respawnTimer+= p_time;
-        if(respawnTimer > 2500)
+        if(respawnTimer > 1000)
         {
             enType = rand() % 10 + 1;
             if (enType <= 5)
                 {
-                p_enemies.push_back(new Enemy(p_enemyImage, p_bulletImage, 96, 96, "common"));
+                p_enemies.push_back(new Enemy(p_enemyCommonImage, p_bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
                 respawnTimer = 0;
                 }
 
             else if ((enType > 5) && (enType < 9))
                 {
-                p_enemies.push_back(new Enemy(p_enemyImage, p_bulletImage, 96, 96, "strong"));
+                p_enemies.push_back(new Enemy(p_enemyThreeBulletImage, p_bulletStrongImage, ENEMY_W, ENEMY_H, "strong"));
                 respawnTimer = 0;
                 }
 
             else if (enType >= 9)
                 {
-                p_enemies.push_back(new Enemy(p_enemyImage, p_bulletImage, 96, 96, "threebullet"));
+                p_enemies.push_back(new Enemy(p_enemyStrongImage, p_bulletThreeBulletImage, ENEMY_W, ENEMY_H, "threebullet"));
                 respawnTimer = 0;
                 }
 
@@ -164,13 +165,25 @@ void BattleScreen::play()
     Font font = createFont();//шрифт
 
     Image map_image;//объект изображения для карты
-    map_image.loadFromFile("images/fon.png");//загружаем файл для карты
+    map_image.loadFromFile("images/map.png");//загружаем файл для карты
     Image heroImage;
-    heroImage.loadFromFile("images/spaceship.png"); // загружаем изображение игрока
-    Image enemyImage;
-    enemyImage.loadFromFile("images/enemyspace.png"); // загружаем изображение врага
-    Image bulletImage;//изображение для пули
-    bulletImage.loadFromFile("images/plazmabullet.png");//загрузили картинку в объект изображения
+    heroImage.loadFromFile("images/Hero_Sprite.png"); // загружаем изображение игрока
+
+    Image enemyCommonImage;
+    enemyCommonImage.loadFromFile("images/Enemy_1_3.png"); // загружаем изображение врага
+    Image enemyThreeBulletImage;
+    enemyThreeBulletImage.loadFromFile("images/Enemy_3.png"); // загружаем изображение врага
+    Image enemyStrongImage;
+    enemyStrongImage.loadFromFile("images/Enemy_2.png"); // загружаем изображение врага
+
+    Image bulletHeroImage;//изображение для пули
+    bulletHeroImage.loadFromFile("images/Hero_bullet.png");//загрузили картинку в объект изображения
+    Image bulletCommonImage;//изображение для пули
+    bulletCommonImage.loadFromFile("images/Enemy_bullet_1.png");//загрузили картинку в объект изображения
+    Image bulletThreeBulletImage;//изображение для пули
+    bulletThreeBulletImage.loadFromFile("images/Enemy_bullet_2.png");//загрузили картинку в объект изображения
+    Image bulletStrongImage;//изображение для пули
+    bulletStrongImage.loadFromFile("images/Enemy_bullet_3.png");//загрузили картинку в объект изображения
 
     Texture map;//текстура карты
     map.loadFromImage(map_image);//заряжаем текстуру картинкой
@@ -180,7 +193,7 @@ void BattleScreen::play()
     Clock clock;
 
 
-    PlayerShip player{heroImage, bulletImage, (SCREEN_W - 96)/2, SCREEN_H - 10 - 96, 96, 96};//объект класса игрока
+    PlayerShip player{heroImage, bulletHeroImage, (SCREEN_W - PLAYER_W)/2, SCREEN_H - 10 - PLAYER_H, PLAYER_W, PLAYER_H};//объект класса игрока
 
     std::list<Bullet*> enBullets; // Список вражеских пуль
     std::list<Bullet*> plBullets; // Список пуль игрока
@@ -188,11 +201,11 @@ void BattleScreen::play()
     std::list<Enemy*> enemies; // Список пуль
 
 
-    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
-    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
-    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
-    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
-    enemies.push_back(new Enemy(enemyImage, bulletImage, 96, 96, "common"));
+    enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
+    enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
+    enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
+    enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
+    enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
 
 
     while (window.isOpen())
@@ -211,7 +224,8 @@ void BattleScreen::play()
                 clock.restart();
         }
 
-        respawnEnemy(time, enemies, enemyImage, bulletImage);
+        respawnEnemy(time, enemies, enemyCommonImage, enemyThreeBulletImage, enemyStrongImage,
+                     bulletCommonImage, bulletThreeBulletImage, bulletStrongImage);
 
         updateObjects(time, player, plBullets, enemies, enBullets);
 
