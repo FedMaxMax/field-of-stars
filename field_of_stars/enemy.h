@@ -25,7 +25,7 @@ protected:
     virtual void shoot(std::list<Bullet*>& p_bulletList); // Используется лист, так как пуль может быть несколько
 
 public:
-    Enemy(Image &p_image, Image &p_bulletImage, uint16_t p_w, uint16_t p_h, std::string p_type);
+    Enemy(uint16_t p_w, uint16_t p_h, std::string p_type);
     void update(); // Эта функция отвечает за изменение скорости и направления движения
                    // Определяет траекторию движения объекта
     uint16_t getCost();

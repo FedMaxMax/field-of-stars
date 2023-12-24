@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <list>
 #include <ctime>
+#include <array>
 #include "global.h"
 #include "playership.h"
 #include "playerstate.h"
@@ -23,11 +24,23 @@ class BattleScreen
 private:
     uint32_t m_playerScore; // счет игрока
 
-    void updateObjects(float& p_time, PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets);
-    void collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets, PlayerState& p_state);
-    void draw(RenderWindow& p_window,PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets, PlayerState& p_state);
-    void respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Image p_enemyCommonImage, Image p_enemyThreeBulletImage, Image p_enemyStrongImage,
-                      Image p_bulletCommonImage, Image p_bulletThreeBulletImage, Image p_bulletStrongImage);
+    RenderWindow m_window;
+    Image m_map_image;
+    Image m_heroImage;
+    std::array<Image, 3> m_enemyImage; // Массив изображений врагов
+    std::array<Image, 4> m_bulletImage; // Массив изображений пуль
+
+    PlayerShip m_player;
+    PlayerState m_state;
+    std::list<Bullet*> m_enBullets; // Список вражеских пуль
+    std::list<Bullet*> m_plBullets; // Список пуль игрока
+    std::list<Enemy*> m_enemies; // Список пуль
+
+    void updateObjects(float& p_time);
+    void collisionCheck();
+    void draw();
+    void respawnEnemy(float& p_time);
+
 public:
     BattleScreen();
     void play();

@@ -13,7 +13,7 @@ private:
 
     void editTitle(std::string p_title);
 public:
-    PlayerState(sf::Font &p_font, uint16_t p_score, uint16_t p_health);
+    PlayerState(uint16_t p_score, uint16_t p_health);
     void setScore(uint16_t p_score);
     void setHealth(uint16_t p_health);
 };

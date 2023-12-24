@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <list>
 #include <ctime>
+#include <string>
 #include "global.h"
 #include "playership.h"
 #include "entity.h"
@@ -9,55 +10,77 @@
 #include "bullet.h"
 #include "playerstate.h"
 #include "battlescreen.h"
+#include "textwindow.h"
+/*
+ *VideoMode desktop = sf::VideoMode::getDesktopMode();
+ */
+BattleScreen::BattleScreen(): m_window {sf::VideoMode(SCREEN_W, SCREEN_H, sf::VideoMode::getDesktopMode().bitsPerPixel), "Field of stars"},
+                              m_player{(float) ((SCREEN_W - PLAYER_W)/2), (float) (SCREEN_H - 10 - PLAYER_H), PLAYER_W, PLAYER_H},//объект класса игрока
+                              m_state{0, 100} // Меню с информацией о здоровье и очках игрока
+{
+    m_playerScore = 0;
+    m_map_image.loadFromFile("images/map.png");//загружаем файл для карты
+    m_heroImage.loadFromFile("images/Hero_Sprite.png"); // загружаем изображение игрока
+    m_enemyImage[0].loadFromFile("images/Enemy_1_3.png"); // загружаем изображение врага
+    m_enemyImage[1].loadFromFile("images/Enemy_2.png");
+    m_enemyImage[2].loadFromFile("images/Enemy_3.png");
+    m_bulletImage[0].loadFromFile("images/Hero_bullet.png"); //изображение для пули
+    m_bulletImage[1].loadFromFile("images/Enemy_bullet_1.png");
+    m_bulletImage[2].loadFromFile("images/Enemy_bullet_2.png");
+    m_bulletImage[3].loadFromFile("images/Enemy_bullet_3.png");
 
-void BattleScreen::updateObjects(float& p_time, PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets)
+    m_player.setImage(m_heroImage);
+    m_player.setBulletImage(m_bulletImage[0]);
+}
+
+void BattleScreen::updateObjects(float& p_time)
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
-    for (itBul = p_enBullets.begin(); itBul != p_enBullets.end(); itBul++) // Обновляем пули. Должно быть перед обновлением врагов
+    for (itBul = m_enBullets.begin(); itBul != m_enBullets.end(); itBul++) // Обновляем пули. Должно быть перед обновлением врагов
                                                                    // и игрока, так как они могут создать новые!
     {
         (*itBul)->update();
         (*itBul)->move(p_time);
     }
 
-    for (itBul = p_plBullets.begin(); itBul != p_plBullets.end(); itBul++)
+    for (itBul = m_plBullets.begin(); itBul != m_plBullets.end(); itBul++)
     {
         (*itBul)->update();
         (*itBul)->move(p_time);
     }
 
-    p_player.update(); // Обновляем игрока
-    p_player.move(p_time);
-    p_player.increaseShootTimer(p_time, p_plBullets);
+    m_player.update(); // Обновляем игрока
+    m_player.move(p_time);
+    m_player.increaseShootTimer(p_time, m_plBullets);
 
-    for(itEn = p_enemies.begin(); itEn != p_enemies.end(); itEn++) // Обновляем врагов
+    for(itEn = m_enemies.begin(); itEn != m_enemies.end(); itEn++) // Обновляем врагов
     {
         (*itEn)->update();
         (*itEn)->move(p_time);
-        (*itEn)->increaseShootTimer(p_time, p_enBullets);
+        (*itEn)->increaseShootTimer(p_time, m_enBullets);
     }
 }
 
-void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets, PlayerState& p_state)
+void BattleScreen::collisionCheck()
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
-    for(itBul = p_enBullets.begin(); itBul != p_enBullets.end(); itBul++) // Проверяем столкновение пуль с игроком
+    for(itBul = m_enBullets.begin(); itBul != m_enBullets.end(); itBul++) // Проверяем столкновение пуль с игроком
     {
-        if(p_player.getRect().intersects((*itBul)->getRect()))
+        if(m_player.getRect().intersects((*itBul)->getRect()))
         {
-            p_player.getDamaged((*itBul)->getCollisionDamage());
-            p_state.setHealth(p_player.getHealth());
+            m_player.getDamaged((*itBul)->getCollisionDamage());
+            m_state.setHealth(m_player.getHealth());
             (*itBul)->die();
         }
     }
 
-    for(itBul = p_plBullets.begin(); itBul != p_plBullets.end(); itBul++) // Проверяем столкновение пуль с врагами
+    for(itBul = m_plBullets.begin(); itBul != m_plBullets.end(); itBul++) // Проверяем столкновение пуль с врагами
     {
         if((*itBul)->isAlive())
         {
-            for(itEn = p_enemies.begin(); itEn != p_enemies.end() && (*itBul)->isAlive(); itEn++)
+            for(itEn = m_enemies.begin(); itEn != m_enemies.end() && (*itBul)->isAlive(); itEn++)
             {
                 if((*itEn)->isAlive())
                 {
@@ -69,7 +92,7 @@ void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_pl
                         if(!(*itEn)->isAlive())
                         {
                             m_playerScore += (*itEn)->getCost();
-                            p_state.setScore(m_playerScore);
+                            m_state.setScore(m_playerScore);
                         }
                     }
                 }
@@ -78,54 +101,54 @@ void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_pl
     }
 }
 
-void BattleScreen::draw(RenderWindow& p_window,PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets, PlayerState& p_state)
+
+void BattleScreen::draw()
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
-    for(itBul = p_enBullets.begin(); itBul != p_enBullets.end(); itBul++) // Рисуем вражеские пули (удаляем если уничтожены)
+    for(itBul = m_enBullets.begin(); itBul != m_enBullets.end(); itBul++) // Рисуем вражеские пули (удаляем если уничтожены)
     {
         if((*itBul)->isAlive())
         {
-            p_window.draw(*((*itBul)->getSprite()));
+            m_window.draw(*((*itBul)->getSprite()));
         } else {
             delete *itBul;
-            p_enBullets.erase(itBul);
+            m_enBullets.erase(itBul);
         }
     }
 
-    for(itBul = p_plBullets.begin(); itBul != p_plBullets.end(); itBul++) // Рисуем пули игрока (удаляем если уничтожены)
+    for(itBul = m_plBullets.begin(); itBul != m_plBullets.end(); itBul++) // Рисуем пули игрока (удаляем если уничтожены)
     {
         if((*itBul)->isAlive())
         {
-            p_window.draw(*((*itBul)->getSprite()));
+            m_window.draw(*((*itBul)->getSprite()));
         } else {
             delete *itBul;
-            p_plBullets.erase(itBul);
+            m_plBullets.erase(itBul);
         }
 
     }
 
-    for(itEn = p_enemies.begin(); itEn != p_enemies.end(); itEn++) // Рисуем врагов (удаляем если уничтожены)
+    for(itEn = m_enemies.begin(); itEn != m_enemies.end(); itEn++) // Рисуем врагов (удаляем если уничтожены)
     {
         if((*itEn)->isAlive())
         {
-            p_window.draw(*((*itEn)->getSprite()));
+            m_window.draw(*((*itEn)->getSprite()));
         } else {
             delete *itEn;
-            p_enemies.erase(itEn);
+            m_enemies.erase(itEn);
         }
     }
 
-    p_window.draw(*(p_player.getSprite())); // Рисуем игрока
-    p_state.draw(p_window);
+    m_window.draw(*(m_player.getSprite())); // Рисуем игрока
+    m_state.draw(m_window);
 }
 
-void BattleScreen::respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Image p_enemyCommonImage, Image p_enemyThreeBulletImage, Image p_enemyStrongImage,
-                                Image p_bulletCommonImage, Image p_bulletThreeBulletImage, Image p_bulletStrongImage)
+void BattleScreen::respawnEnemy(float& p_time)
 {
     uint16_t enType;
     static float respawnTimer = 0;
-    if (p_enemies.size() < ENEMY_COUNT)
+    if (m_enemies.size() < ENEMY_COUNT)
     {
         respawnTimer+= p_time;
         if(respawnTimer > 1000)
@@ -133,19 +156,25 @@ void BattleScreen::respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Ima
             enType = rand() % 10 + 1;
             if (enType <= 5)
                 {
-                p_enemies.push_back(new Enemy(p_enemyCommonImage, p_bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
+                m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
+                m_enemies.back()->setImage(m_enemyImage[0]);
+                m_enemies.back()->setBulletImage(m_bulletImage[1]);
                 respawnTimer = 0;
                 }
 
             else if ((enType > 5) && (enType < 9))
                 {
-                p_enemies.push_back(new Enemy(p_enemyThreeBulletImage, p_bulletStrongImage, ENEMY_W, ENEMY_H, "strong"));
+                m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "threebullet"));
+                m_enemies.back()->setImage(m_enemyImage[1]);
+                m_enemies.back()->setBulletImage(m_bulletImage[2]);
                 respawnTimer = 0;
                 }
 
             else if (enType >= 9)
                 {
-                p_enemies.push_back(new Enemy(p_enemyStrongImage, p_bulletThreeBulletImage, ENEMY_W, ENEMY_H, "threebullet"));
+                m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "strong"));
+                m_enemies.back()->setImage(m_enemyImage[2]);
+                m_enemies.back()->setBulletImage(m_bulletImage[3]);
                 respawnTimer = 0;
                 }
 
@@ -153,91 +182,111 @@ void BattleScreen::respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Ima
     }
 }
 
-BattleScreen::BattleScreen()
-{
-    m_playerScore = 0;
-}
-
 void BattleScreen::play()
 {
-
     srand(time(0));
-    VideoMode desktop = sf::VideoMode::getDesktopMode();
-    RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, desktop.bitsPerPixel), "Field of stars");
-
     Font font;//шрифт
-    font.loadFromFile("Visitor Rus.ttf");//передаем нашему шрифту файл шрифта
-
-    Image map_image;//объект изображения для карты
-    map_image.loadFromFile("images/map.png");//загружаем файл для карты
-    Image heroImage;
-    heroImage.loadFromFile("images/Hero_Sprite.png"); // загружаем изображение игрока
-
-    Image enemyCommonImage;
-    enemyCommonImage.loadFromFile("images/Enemy_1_3.png"); // загружаем изображение врага
-    Image enemyThreeBulletImage;
-    enemyThreeBulletImage.loadFromFile("images/Enemy_3.png"); // загружаем изображение врага
-    Image enemyStrongImage;
-    enemyStrongImage.loadFromFile("images/Enemy_2.png"); // загружаем изображение врага
-
-    Image bulletHeroImage;//изображение для пули
-    bulletHeroImage.loadFromFile("images/Hero_bullet.png");//загрузили картинку в объект изображения
-    Image bulletCommonImage;//изображение для пули
-    bulletCommonImage.loadFromFile("images/Enemy_bullet_1.png");//загрузили картинку в объект изображения
-    Image bulletThreeBulletImage;//изображение для пули
-    bulletThreeBulletImage.loadFromFile("images/Enemy_bullet_2.png");//загрузили картинку в объект изображения
-    Image bulletStrongImage;//изображение для пули
-    bulletStrongImage.loadFromFile("images/Enemy_bullet_3.png");//загрузили картинку в объект изображения
+    font.loadFromFile("Visitor Rus.ttf");
+    m_state.setFont(font);
 
     Texture map;//текстура карты
-    map.loadFromImage(map_image);//заряжаем текстуру картинкой
+    map.loadFromImage(m_map_image);//заряжаем текстуру картинкой
     Sprite s_map;//создаём спрайт для карты
     s_map.setTexture(map);//заливаем текстуру спрайтом
 
     Clock clock;
 
-    PlayerShip player{heroImage, bulletHeroImage, (SCREEN_W - PLAYER_W)/2, SCREEN_H - 10 - PLAYER_H, PLAYER_W, PLAYER_H};//объект класса игрока
+    for (int i = 0; i < 5;i++)
+    {
+        m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
+        m_enemies.back()->setImage(m_enemyImage[0]);
+        m_enemies.back()->setBulletImage(m_bulletImage[1]);
+    }
 
-    std::list<Bullet*> enBullets; // Список вражеских пуль
-    std::list<Bullet*> plBullets; // Список пуль игрока
-    std::list<Enemy*> enemies; // Список пуль
-
-    enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
-    enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
-    enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
-    enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
-    enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
-
-    PlayerState state{font, 0, player.getHealth()};
-
-    while (window.isOpen())
+    while (m_window.isOpen())
     {
         float time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
         time = time/1000;
 
-        sf::Event event;
-        while (window.pollEvent(event))
+
+        if (!m_player.isAlive())
         {
-            if (event.type == sf::Event::Closed)
-                window.close();
+            m_window.clear();
 
-            while (Keyboard::isKeyPressed(Keyboard::P)) // Останавливаем если нажата клавиша P
-                clock.restart();
-        }
+            TextWindow loseWindow{SCREEN_W/4-25, SCREEN_H/4, "         You lose\n Your score: " + std::to_string(m_playerScore) + "\n R         -  Repeat\n Esc     -  Quit Game",
+                        50, Color::Red, SCREEN_W/2+85, SCREEN_H/2 - 60, DARKBLUE};
+            loseWindow.setFont(font);
+            loseWindow.draw(m_window);
+            m_window.display();
+            clock.restart();
+            sf::Event choice;
+            while (m_window.pollEvent(choice))
+            {
+                if (Keyboard::isKeyPressed(Keyboard::R))
+                {
+                    m_player.revive();
+                    m_player.setHealth(100);
+                    m_playerScore = 0;
+                    m_state.setScore(m_playerScore);
+                    m_window.clear();
+                    while (!m_enemies.empty())
+                    {
+                        delete m_enemies.back();
+                        m_enemies.pop_back();
+                    }
+                    while(!m_enBullets.empty())
+                    {
+                        delete m_enBullets.back();
+                        m_enBullets.pop_back();
+                    }
+                    while(!m_plBullets.empty())
+                    {
+                        delete m_plBullets.back();
+                        m_plBullets.pop_back();
 
-        respawnEnemy(time, enemies, enemyCommonImage, enemyThreeBulletImage, enemyStrongImage,
-                     bulletCommonImage, bulletThreeBulletImage, bulletStrongImage);
+                    }
+                    for (int i = 0; i < 5;i++)
+                    {
+                        m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
+                        m_enemies.back()->setImage(m_enemyImage[0]);
+                        m_enemies.back()->setBulletImage(m_bulletImage[1]);
+                    }
+                }
 
-        updateObjects(time, player, plBullets, enemies, enBullets);
+                else if (Keyboard::isKeyPressed(Keyboard::Escape))
+                {
+                    choice.type = sf::Event::Closed;
+                }
+                if (choice.type == sf::Event::Closed)
+                    m_window.close();
+            }
+         }
 
-        collisionCheck(player, plBullets, enemies, enBullets, state);
+        else
+        {
+            sf::Event event;
+            while (m_window.pollEvent(event))
+            {
+                if (event.type == sf::Event::Closed)
+                    m_window.close();
 
-        window.clear(); // Внимание! Порядок отрисовки важен! Порядок отрисовки: Карта - Пули - Враги - Игрок
-        window.draw(s_map); // Рисуем фон
+                while (Keyboard::isKeyPressed(Keyboard::P)) // Останавливаем если нажата клавиша P
+                    clock.restart();
+            }
 
-        draw(window, player, plBullets, enemies, enBullets, state);
 
-        window.display();
+            respawnEnemy(time);
+
+            updateObjects(time);
+
+            collisionCheck();
+
+            m_window.clear(); // Внимание! Порядок отрисовки важен! Порядок отрисовки: Карта - Пули - Враги - Игрок
+            m_window.draw(s_map); // Рисуем фон
+
+            draw();
+
+            m_window.display();        }
     }
 }

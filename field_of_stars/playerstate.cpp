@@ -2,9 +2,9 @@
 #include <string>
 #include "global.h"
 
-PlayerState::PlayerState(sf::Font &p_font, uint16_t p_score, uint16_t p_health)
-    : TextWindow{10, 10, "Health: " + std::to_string(p_health) + "\nScore: 0", 26, sf::Color::Red,
-                 p_font, 180, 75, DARKBLUE}
+PlayerState::PlayerState(uint16_t p_score, uint16_t p_health)
+    : TextWindow{10, 10, "Health: " + std::to_string(p_health) + "\nScore: 0", 26,
+                 sf::Color::Red, 180, 75, DARKBLUE}
 {
 
     m_score = p_score;

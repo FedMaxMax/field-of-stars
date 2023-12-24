@@ -18,12 +18,12 @@ public:
                std::string p_title, //Текст для вывода
                uint8_t p_size,      //Ширина текста
                sf::Color p_color,   //Цвет текста
-               sf::Font &p_font,    //Шрифт текста
                uint32_t p_width,    //Ширина фона
                uint32_t p_height,   //Высота фона
                sf::Color p_colorBackground);//Цвет фона
     void editTitle(std::string p_title);//Метод, изменяющий текст
     void draw(sf::RenderWindow& p_window);  //Метод, выводящий фон и текст на экран
+    void setFont(sf::Font &p_font);
 };
 
 #endif // TEXTWINDOW_H

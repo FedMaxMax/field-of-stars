@@ -1,15 +1,16 @@
 #include "playership.h"
 #include <iostream>
 
-PlayerShip::PlayerShip(Image &p_image, Image &p_bulletImage, float p_x, float p_y, uint16_t p_w, uint16_t p_h)
-    : Unit(p_image, p_bulletImage, p_x, p_y, p_w, p_h, 100, 300)
+PlayerShip::PlayerShip(float p_x, float p_y, uint16_t p_w, uint16_t p_h)
+    : Unit(p_x, p_y, p_w, p_h, 100, 400)
 {
     m_speed = 0.4;
 }
 
 void PlayerShip::shoot(std::list<Bullet *>& p_bulletList)
 {
-    p_bulletList.push_back(new Bullet(m_bulletImage, 90, 0.6f, m_x + (m_w/2) - BULLET_W/2, m_y - BULLET_H, BULLET_W, BULLET_H, 50));
+    p_bulletList.push_back(new Bullet(90, 0.6f, m_x + (m_w - BULLET_W)/2, m_y - BULLET_H, BULLET_W, BULLET_H, 50));
+    p_bulletList.back()->setImage(m_bulletImage);
 }
 
 void PlayerShip::increaseShootTimer(float p_time, std::list<Bullet*>& p_bulletList)
