@@ -2,8 +2,8 @@
 #include <cmath>
 #include "global.h"
 
-Bullet::Bullet(Image &p_image, uint16_t p_dir, float p_speed, float p_x, float p_y, uint16_t p_w, uint16_t p_h,  uint16_t p_damage)
-    :Entity(p_image, p_x, p_y, p_w, p_h) // Вызываем конструктор базового класса
+Bullet::Bullet(uint16_t p_dir, float p_speed, float p_x, float p_y, uint16_t p_w, uint16_t p_h,  uint16_t p_damage)
+    :Entity(p_x, p_y, p_w, p_h) // Вызываем конструктор базового класса
 {
     m_speed = p_speed;
     m_dir = p_dir;

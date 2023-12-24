@@ -2,8 +2,8 @@
 #include <cmath>
 #include "global.h"
 
-Enemy::Enemy(sf::Image &p_image, sf::Image &p_bulletImage, uint16_t p_w, uint16_t p_h, std::string p_type)
-    : Unit(p_image, p_bulletImage, rand()%(SCREEN_W - p_w - 20) + 10, rand()%(SCREEN_H - p_h - 220) + 10, p_w, p_h, 50, 1200)
+Enemy::Enemy(uint16_t p_w, uint16_t p_h, std::string p_type)
+    : Unit(rand()%(SCREEN_W - p_w - 20) + 10, rand()%(SCREEN_H - p_h - 220) + 10, p_w, p_h, 50, 1200)
 {
     m_type = p_type;
     m_cost = 100;
@@ -45,14 +45,22 @@ void Enemy::shoot(std::list<Bullet *> &p_bulletList)
 {
     if(m_type == "threebullet")
     {
-        p_bulletList.push_back(new Bullet(m_bulletImage, -60, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
-        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
-        p_bulletList.push_back(new Bullet(m_bulletImage, -120, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+        p_bulletList.push_back(new Bullet(-60, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+        p_bulletList.back()->setImage(m_bulletImage);
+        p_bulletList.push_back(new Bullet(-90, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+        p_bulletList.back()->setImage(m_bulletImage);
+        p_bulletList.push_back(new Bullet(-120, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+        p_bulletList.back()->setImage(m_bulletImage);
     } else
-    if(m_type == "strong")
-        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.5f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 30));
-    else
-        p_bulletList.push_back(new Bullet(m_bulletImage, -90, 0.45f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 20));
+        if(m_type == "strong")
+        {
+            p_bulletList.push_back(new Bullet(-90, 0.5f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 30));
+            p_bulletList.back()->setImage(m_bulletImage);
+        } else
+        {
+            p_bulletList.push_back(new Bullet(-90, 0.45f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 20));
+            p_bulletList.back()->setImage(m_bulletImage);
+        }
 }
 
 void Enemy::update()

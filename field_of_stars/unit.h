@@ -27,7 +27,7 @@ protected:
     virtual void shoot(std::list<Bullet*>& p_bulletList) = 0; // Используется лист, так как пуль может быть несколько
 
 public:
-    Unit(Image &p_image, Image &p_bulletImage, float p_x, float p_y, uint16_t p_w, uint16_t p_h, uint16_t p_health, uint16_t p_shootTime);
+    Unit(float p_x, float p_y, uint16_t p_w, uint16_t p_h, uint16_t p_health, uint16_t p_shootTime);
     void increaseShootTimer(float p_time, std::list<Bullet*>& p_bulletList); // Добавляем время в таймер выстрела.
                                                     // Если выстрел произошел метод добавляет пули в лист
                                                     // Используется лист, потому что пуль может быть больше чем одна.
