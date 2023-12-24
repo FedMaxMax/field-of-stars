@@ -4,7 +4,6 @@
 PlayerShip::PlayerShip(Image &p_image, Image &p_bulletImage, float p_x, float p_y, uint16_t p_w, uint16_t p_h)
     : Unit(p_image, p_bulletImage, p_x, p_y, p_w, p_h, 100, 300)
 {
-    m_playerScore = 0;
     m_speed = 0.4;
 }
 
@@ -59,11 +58,6 @@ void PlayerShip::update()
     } else {
         m_dx = 0;
     }
-}
-
-void PlayerShip::increaseScore(uint16_t p_award)
-{
-    m_playerScore += p_award;
 }
 
 bool PlayerShip::getDamaged(uint16_t p_damage)

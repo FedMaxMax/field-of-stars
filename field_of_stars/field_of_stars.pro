@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     unit.cpp \
     playership.cpp \
     battlescreen.cpp\
-    textwindow.cpp
+    textwindow.cpp \
+    playerstate.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
@@ -35,5 +36,6 @@ HEADERS += \
     unit.h \
     playership.h \
     battlescreen.h\
-    textwindow.h
+    textwindow.h \
+    playerstate.h
 

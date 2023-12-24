@@ -1,4 +1,6 @@
 #include "textwindow.h"
+#include <iostream>
+#include <string>
 
 TextWindow::TextWindow(uint32_t p_x,
                        uint32_t p_y,
@@ -14,7 +16,7 @@ TextWindow::TextWindow(uint32_t p_x,
 {
     m_background.setFillColor(p_colorBackground);
     m_background.setPosition(p_x,p_y);
-    m_title.setPosition(p_x,p_y);
+    m_title.setPosition(p_x + 10,p_y);
     m_title.setColor(p_color);
 }
 

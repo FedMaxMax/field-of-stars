@@ -7,18 +7,8 @@
 #include "entity.h"
 #include "enemy.h"
 #include "bullet.h"
+#include "playerstate.h"
 #include "battlescreen.h"
-
-Font BattleScreen::createFont()
-{
-    Font font;//шрифт
-    font.loadFromFile("CyrilicOld.ttf");//передаем нашему шрифту файл шрифта
-    Text text("", font, 20);//создаем объект текст
-    text.setColor(Color::Red);//покрасили текст в красный
-    text.setStyle(Text::Bold);//жирный текст.
-    return font;
-}
-
 
 void BattleScreen::updateObjects(float& p_time, PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets)
 {
@@ -49,7 +39,7 @@ void BattleScreen::updateObjects(float& p_time, PlayerShip& p_player, std::list<
     }
 }
 
-void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets)
+void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets, PlayerState& p_state)
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
@@ -58,6 +48,7 @@ void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_pl
         if(p_player.getRect().intersects((*itBul)->getRect()))
         {
             p_player.getDamaged((*itBul)->getCollisionDamage());
+            p_state.setHealth(p_player.getHealth());
             (*itBul)->die();
         }
     }
@@ -74,6 +65,12 @@ void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_pl
                     {
                         (*itEn)->getDamaged((*itBul)->getCollisionDamage());
                         (*itBul)->die();
+
+                        if(!(*itEn)->isAlive())
+                        {
+                            m_playerScore += (*itEn)->getCost();
+                            p_state.setScore(m_playerScore);
+                        }
                     }
                 }
             }
@@ -81,7 +78,7 @@ void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_pl
     }
 }
 
-void BattleScreen::draw(RenderWindow& p_window,PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets)
+void BattleScreen::draw(RenderWindow& p_window,PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets, PlayerState& p_state)
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
@@ -120,6 +117,7 @@ void BattleScreen::draw(RenderWindow& p_window,PlayerShip& p_player, std::list<B
     }
 
     p_window.draw(*(p_player.getSprite())); // Рисуем игрока
+    p_state.draw(p_window);
 }
 
 void BattleScreen::respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Image p_enemyCommonImage, Image p_enemyThreeBulletImage, Image p_enemyStrongImage,
@@ -155,6 +153,11 @@ void BattleScreen::respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Ima
     }
 }
 
+BattleScreen::BattleScreen()
+{
+    m_playerScore = 0;
+}
+
 void BattleScreen::play()
 {
 
@@ -162,7 +165,8 @@ void BattleScreen::play()
     VideoMode desktop = sf::VideoMode::getDesktopMode();
     RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, desktop.bitsPerPixel), "Field of stars");
 
-    Font font = createFont();//шрифт
+    Font font;//шрифт
+    font.loadFromFile("Visitor Rus.ttf");//передаем нашему шрифту файл шрифта
 
     Image map_image;//объект изображения для карты
     map_image.loadFromFile("images/map.png");//загружаем файл для карты
@@ -192,21 +196,19 @@ void BattleScreen::play()
 
     Clock clock;
 
-
     PlayerShip player{heroImage, bulletHeroImage, (SCREEN_W - PLAYER_W)/2, SCREEN_H - 10 - PLAYER_H, PLAYER_W, PLAYER_H};//объект класса игрока
 
     std::list<Bullet*> enBullets; // Список вражеских пуль
     std::list<Bullet*> plBullets; // Список пуль игрока
-
     std::list<Enemy*> enemies; // Список пуль
 
-
     enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
     enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
     enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
     enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
     enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
 
+    PlayerState state{font, 0, player.getHealth()};
 
     while (window.isOpen())
     {
@@ -229,12 +231,12 @@ void BattleScreen::play()
 
         updateObjects(time, player, plBullets, enemies, enBullets);
 
-        collisionCheck(player, plBullets, enemies, enBullets);
+        collisionCheck(player, plBullets, enemies, enBullets, state);
 
         window.clear(); // Внимание! Порядок отрисовки важен! Порядок отрисовки: Карта - Пули - Враги - Игрок
         window.draw(s_map); // Рисуем фон
 
-        draw(window, player, plBullets, enemies, enBullets);
+        draw(window, player, plBullets, enemies, enBullets, state);
 
         window.display();
     }

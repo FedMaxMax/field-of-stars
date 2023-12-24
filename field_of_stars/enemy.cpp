@@ -24,12 +24,12 @@ Enemy::Enemy(sf::Image &p_image, sf::Image &p_bulletImage, uint16_t p_w, uint16_
 
     if(m_type == "threebullet")
     {
-        m_cost = 150;
+        m_cost = 200;
         m_shootTime = 1500;
     } else
     if(m_type == "strong")
     {
-        m_cost = 200;
+        m_cost = 300;
         m_shootTime = 1000;
         m_speed = 0.2;
         setHealth(100);
