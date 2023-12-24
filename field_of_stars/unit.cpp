@@ -1,9 +1,8 @@
 #include "unit.h"
 
-Unit::Unit(Image &p_image, Image &p_bulletImage, float p_x, float p_y, uint16_t p_w, uint16_t p_h, uint16_t p_health, uint16_t p_shootTime)
-    : Entity(p_image, p_x, p_y, p_w, p_h) // Вызываем конструктор базового класса и инициализируем константу
+Unit::Unit(float p_x, float p_y, uint16_t p_w, uint16_t p_h, uint16_t p_health, uint16_t p_shootTime)
+    : Entity(p_x, p_y, p_w, p_h) // Вызываем конструктор базового класса и инициализируем константу
 {
-    m_bulletImage = p_bulletImage;
     m_shootTime = p_shootTime;
     m_health = p_health;
 }

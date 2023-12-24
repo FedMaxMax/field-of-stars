@@ -27,16 +27,18 @@ protected:
     float m_speed;     // Абсолютная скорость
 
 public:
-    Entity(Image &p_image, float p_x, float p_y, uint16_t p_w, uint16_t p_h);
+    Entity(float p_x, float p_y, uint16_t p_w, uint16_t p_h);
     virtual void update() = 0; // Эта функция отвечает за изменение скорости и направления движения
                                // Определяет траекторию движения объекта
     void move(float p_time);
     void die();
+    void revive();
     void rotate(float p_angle);
     bool isAlive();
     uint16_t getCollisionDamage();
     Sprite * getSprite();
     void setCollisionDamage(uint16_t p_collisionDamage);
+    void setImage(Image &p_image);
     FloatRect getRect();
     virtual ~Entity(){}
 };

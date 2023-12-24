@@ -24,7 +24,7 @@ private:
     void control(); // Функция, где происходит считывание нажатий клавиш игроком
     virtual void shoot(std::list<Bullet *>& p_bulletList); // Используется лист, так как пуль может быть несколько
 public:
-    PlayerShip(Image &p_image, Image &p_bulletImage, float p_x, float p_y, uint16_t p_w, uint16_t p_h);
+    PlayerShip(float p_x, float p_y, uint16_t p_w, uint16_t p_h);
     void update(); // Эта функция отвечает за изменение скорости и направления движения
                    // Определяет траекторию движения объекта
     void increaseShootTimer(float p_time, std::list<Bullet*>& p_bulletList); // Добавляем время в таймер выстрела.
@@ -33,6 +33,7 @@ public:
     void increaseScore(uint16_t p_award);
     void die();
     bool getDamaged(uint16_t p_damage);
+
 };
 
 #endif // PLAYER_H

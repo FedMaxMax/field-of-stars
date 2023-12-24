@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <list>
 #include <ctime>
+#include <array>
 #include "global.h"
 #include "playership.h"
 #include "entity.h"
@@ -20,14 +21,24 @@ using namespace sf;
 class BattleScreen
 {
 private:
+    RenderWindow m_window;
+    Image m_map_image;
+    Image m_heroImage;
+    std::array<Image, 1> m_enemyImage; // Массив изображений врагов
+    std::array<Image, 1> m_bulletImage; // Массив изображений пуль
+    PlayerShip m_player;
+    std::list<Bullet*> m_enBullets; // Список вражеских пуль
+    std::list<Bullet*> m_plBullets; // Список пуль игрока
+    std::list<Enemy*> m_enemies; // Список пуль
+
 
     Font createFont();
-    void updateObjects(float& p_time, PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets);
-    void collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets);
-    void draw(RenderWindow& p_window,PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets);
-    void respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Image p_enemyCommonImage, Image p_enemyThreeBulletImage, Image p_enemyStrongImage,
-                      Image p_bulletCommonImage, Image p_bulletThreeBulletImage, Image p_bulletStrongImage);
+    void updateObjects(float& p_time);
+    void collisionCheck();
+    void draw();
+    void respawnEnemy(float& p_time);
 public:
+    BattleScreen();
     void play();
 
 };
