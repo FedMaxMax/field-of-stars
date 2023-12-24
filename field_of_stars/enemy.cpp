@@ -43,20 +43,20 @@ void Enemy::shoot(std::list<Bullet *> &p_bulletList)
 {
     if(m_type == "threebullet")
     {
-        p_bulletList.push_back(new Bullet(-60, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+        p_bulletList.push_back(new Bullet(-60, 0.4f, m_x + (m_w - BULLET_W)/2, m_y + m_h, BULLET_W, BULLET_H, 15));
         p_bulletList.back()->setImage(m_bulletImage);
-        p_bulletList.push_back(new Bullet(-90, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+        p_bulletList.push_back(new Bullet(-90, 0.4f, m_x + (m_w - BULLET_W)/2, m_y + m_h, BULLET_W, BULLET_H, 15));
         p_bulletList.back()->setImage(m_bulletImage);
-        p_bulletList.push_back(new Bullet(-120, 0.4f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 15));
+        p_bulletList.push_back(new Bullet(-120, 0.4f, m_x + (m_w - BULLET_W)/2, m_y + m_h, BULLET_W, BULLET_H, 15));
         p_bulletList.back()->setImage(m_bulletImage);
     } else
         if(m_type == "strong")
         {
-            p_bulletList.push_back(new Bullet(-90, 0.5f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 30));
+            p_bulletList.push_back(new Bullet(-90, 0.5f, m_x + (m_w - BULLET_W)/2, m_y + m_h, BULLET_W, BULLET_H, 30));
             p_bulletList.back()->setImage(m_bulletImage);
         } else
         {
-            p_bulletList.push_back(new Bullet(-90, 0.45f, m_x + (m_w/2) - 8, m_y + m_h, 16, 16, 20));
+            p_bulletList.push_back(new Bullet(-90, 0.45f, m_x + (m_w - BULLET_W)/2, m_y + m_h, BULLET_W, BULLET_H, 20));
             p_bulletList.back()->setImage(m_bulletImage);
         }
 }

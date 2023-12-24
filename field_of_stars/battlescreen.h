@@ -24,15 +24,14 @@ private:
     RenderWindow m_window;
     Image m_map_image;
     Image m_heroImage;
-    std::array<Image, 1> m_enemyImage; // Массив изображений врагов
-    std::array<Image, 1> m_bulletImage; // Массив изображений пуль
+    std::array<Image, 3> m_enemyImage; // Массив изображений врагов
+    std::array<Image, 4> m_bulletImage; // Массив изображений пуль
+
     PlayerShip m_player;
     std::list<Bullet*> m_enBullets; // Список вражеских пуль
     std::list<Bullet*> m_plBullets; // Список пуль игрока
     std::list<Enemy*> m_enemies; // Список пуль
 
-
-    Font createFont();
     void updateObjects(float& p_time);
     void collisionCheck();
     void draw();

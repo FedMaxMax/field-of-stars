@@ -10,7 +10,7 @@ PlayerShip::PlayerShip(float p_x, float p_y, uint16_t p_w, uint16_t p_h)
 
 void PlayerShip::shoot(std::list<Bullet *>& p_bulletList)
 {
-    p_bulletList.push_back(new Bullet(90, 0.6f, m_x + (m_w/2) - 8, m_y - 16, 16, 16, 50));
+    p_bulletList.push_back(new Bullet(90, 0.6f, m_x + (m_w - BULLET_W)/2, m_y - BULLET_H, BULLET_W, BULLET_H, 50));
     p_bulletList.back()->setImage(m_bulletImage);
 }
 

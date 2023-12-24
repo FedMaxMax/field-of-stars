@@ -13,28 +13,21 @@
  *VideoMode desktop = sf::VideoMode::getDesktopMode();
  */
 BattleScreen::BattleScreen(): m_window {sf::VideoMode(SCREEN_W, SCREEN_H, sf::VideoMode::getDesktopMode().bitsPerPixel), "Field of stars"},
-                              m_player{(float) ((SCREEN_W - 96)/2), (float) (SCREEN_H - 10 - 96), 96, 96}//объект класса игрока
+                              m_player{(float) ((SCREEN_W - PLAYER_W)/2), (float) (SCREEN_H - 10 - PLAYER_H), PLAYER_W, PLAYER_H}//объект класса игрока
 {
     m_map_image.loadFromFile("images/map.png");//загружаем файл для карты
     m_heroImage.loadFromFile("images/Hero_Sprite.png"); // загружаем изображение игрока
     m_enemyImage[0].loadFromFile("images/Enemy_1_3.png"); // загружаем изображение врага
+    m_enemyImage[1].loadFromFile("images/Enemy_2.png");
+    m_enemyImage[2].loadFromFile("images/Enemy_3.png");
     m_bulletImage[0].loadFromFile("images/Hero_bullet.png"); //изображение для пули
+    m_bulletImage[1].loadFromFile("images/Enemy_bullet_1.png");
+    m_bulletImage[2].loadFromFile("images/Enemy_bullet_2.png");
+    m_bulletImage[3].loadFromFile("images/Enemy_bullet_3.png");
 
     m_player.setImage(m_heroImage);
     m_player.setBulletImage(m_bulletImage[0]);
-
 }
-
-Font BattleScreen::createFont()
-{
-    Font font;//шрифт
-    font.loadFromFile("CyrilicOld.ttf");//передаем нашему шрифту файл шрифта
-    Text text("", font, 20);//создаем объект текст
-    text.setColor(Color::Red);//покрасили текст в красный
-    text.setStyle(Text::Bold);//жирный текст.
-    return font;
-}
-
 
 void BattleScreen::updateObjects(float& p_time)
 {
@@ -150,25 +143,25 @@ void BattleScreen::respawnEnemy(float& p_time)
             enType = rand() % 10 + 1;
             if (enType <= 5)
                 {
-                m_enemies.push_back(new Enemy(96, 96, "common"));
+                m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
                 m_enemies.back()->setImage(m_enemyImage[0]);
-                m_enemies.back()->setBulletImage(m_bulletImage[0]);
+                m_enemies.back()->setBulletImage(m_bulletImage[1]);
                 respawnTimer = 0;
                 }
 
             else if ((enType > 5) && (enType < 9))
                 {
-                m_enemies.push_back(new Enemy(96, 96, "threebullet"));
-                m_enemies.back()->setImage(m_enemyImage[0]);
-                m_enemies.back()->setBulletImage(m_bulletImage[0]);
+                m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "threebullet"));
+                m_enemies.back()->setImage(m_enemyImage[1]);
+                m_enemies.back()->setBulletImage(m_bulletImage[2]);
                 respawnTimer = 0;
                 }
 
             else if (enType >= 9)
                 {
-                m_enemies.push_back(new Enemy(96, 96, "strong"));
-                m_enemies.back()->setImage(m_enemyImage[0]);
-                m_enemies.back()->setBulletImage(m_bulletImage[0]);
+                m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "strong"));
+                m_enemies.back()->setImage(m_enemyImage[2]);
+                m_enemies.back()->setBulletImage(m_bulletImage[3]);
                 respawnTimer = 0;
                 }
 
@@ -181,7 +174,8 @@ void BattleScreen::play()
 {
 
     srand(time(0));
-    Font font = createFont();//шрифт
+    Font font;//шрифт
+    font.loadFromFile("CyrilicOld.ttf");
 
     Texture map;//текстура карты
     map.loadFromImage(m_map_image);//заряжаем текстуру картинкой
@@ -192,9 +186,9 @@ void BattleScreen::play()
 
     for (int i = 0; i < 5;i++)
         {
-        m_enemies.push_back(new Enemy(96, 96, "common"));
+        m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
         m_enemies.back()->setImage(m_enemyImage[0]);
-        m_enemies.back()->setBulletImage(m_bulletImage[0]);
+        m_enemies.back()->setBulletImage(m_bulletImage[1]);
         }
 
 
@@ -241,9 +235,9 @@ void BattleScreen::play()
                     }
                     for (int i = 0; i < 5;i++)
                     {
-                        m_enemies.push_back(new Enemy(96, 96, "common"));
+                        m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
                         m_enemies.back()->setImage(m_enemyImage[0]);
-                        m_enemies.back()->setBulletImage(m_bulletImage[0]);
+                        m_enemies.back()->setBulletImage(m_bulletImage[1]);
                     }
                 }
 
