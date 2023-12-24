@@ -196,7 +196,7 @@ void BattleScreen::play()
 
     Clock clock;
 
-    for (int i = 0; i < 5;i++)
+    for (int i = 0; i < ENEMY_COUNT;i++)
     {
         m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
         m_enemies.back()->setImage(m_enemyImage[0]);
@@ -246,7 +246,7 @@ void BattleScreen::play()
                         m_plBullets.pop_back();
 
                     }
-                    for (int i = 0; i < 5;i++)
+                    for (int i = 0; i < ENEMY_COUNT;i++)
                     {
                         m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
                         m_enemies.back()->setImage(m_enemyImage[0]);

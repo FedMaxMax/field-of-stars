@@ -8,7 +8,7 @@ Enemy::Enemy(uint16_t p_w, uint16_t p_h, std::string p_type)
     m_type = p_type;
     m_cost = 100;
     m_speed = 0.15;
-    m_dir = rand()%360; // Случайный начальный угол
+    m_dir = rand()%360-180; // Случайный начальный угол
 
     if(m_dir > 45 && m_dir <= 90) // Уменьшаем угол, если он слишком крутой
         m_dir = 45;
@@ -43,11 +43,11 @@ void Enemy::shoot(std::list<Bullet *> &p_bulletList)
 {
     if(m_type == "threebullet")
     {
-        p_bulletList.push_back(new Bullet(-60, 0.4f, m_x + (m_w - BULLET_W)/2, m_y + m_h, BULLET_W, BULLET_H, 15));
+        p_bulletList.push_back(new Bullet(-60, 0.4f, m_x + (m_w - BULLET_W)/2, m_y + m_h - BULLET_H, BULLET_W, BULLET_H, 15));
         p_bulletList.back()->setImage(m_bulletImage);
-        p_bulletList.push_back(new Bullet(-90, 0.4f, m_x + (m_w - BULLET_W)/2, m_y + m_h, BULLET_W, BULLET_H, 15));
+        p_bulletList.push_back(new Bullet(-90, 0.4f, m_x + (m_w - BULLET_W)/2, m_y + m_h - BULLET_H, BULLET_W, BULLET_H, 15));
         p_bulletList.back()->setImage(m_bulletImage);
-        p_bulletList.push_back(new Bullet(-120, 0.4f, m_x + (m_w - BULLET_W)/2, m_y + m_h, BULLET_W, BULLET_H, 15));
+        p_bulletList.push_back(new Bullet(-120, 0.4f, m_x + (m_w - BULLET_W)/2, m_y + m_h - BULLET_H, BULLET_W, BULLET_H, 15));
         p_bulletList.back()->setImage(m_bulletImage);
     } else
         if(m_type == "strong")
@@ -91,8 +91,8 @@ void Enemy::update()
 
         if(angleChanged)
         {
-            if(m_dir >=  360) m_dir -= 360;
-            if(m_dir <= -360) m_dir += 360;
+            if(m_dir >=  180) m_dir -= 180;
+            if(m_dir <= -180) m_dir += 180;
 
             if(m_dir > 45 && m_dir <= 90) // Уменьшаем угол, если он становится слишком крутым
                 m_dir = 45;
