@@ -11,9 +11,8 @@
 #include "playerstate.h"
 #include "battlescreen.h"
 #include "textwindow.h"
-/*
- *VideoMode desktop = sf::VideoMode::getDesktopMode();
- */
+#include "map.h"
+
 BattleScreen::BattleScreen(): m_window {sf::VideoMode(SCREEN_W, SCREEN_H, sf::VideoMode::getDesktopMode().bitsPerPixel), "Field of stars"},
                               m_player{(float) ((SCREEN_W - PLAYER_W)/2), (float) (SCREEN_H - 10 - PLAYER_H), PLAYER_W, PLAYER_H},//объект класса игрока
                               m_state{0, 100} // Меню с информацией о здоровье и очках игрока
@@ -31,12 +30,17 @@ BattleScreen::BattleScreen(): m_window {sf::VideoMode(SCREEN_W, SCREEN_H, sf::Vi
 
     m_player.setImage(m_heroImage);
     m_player.setBulletImage(m_bulletImage[0]);
+    m_map.setImage(m_map_image);
+
 }
 
-void BattleScreen::updateObjects(float& p_time)
+void BattleScreen::updateObjects(float p_time)
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
+
+    m_map.update(p_time);
+
     for (itBul = m_enBullets.begin(); itBul != m_enBullets.end(); itBul++) // Обновляем пули. Должно быть перед обновлением врагов
                                                                    // и игрока, так как они могут создать новые!
     {
@@ -106,6 +110,9 @@ void BattleScreen::draw()
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
+
+    m_map.draw(m_window);
+
     for(itBul = m_enBullets.begin(); itBul != m_enBullets.end(); itBul++) // Рисуем вражеские пули (удаляем если уничтожены)
     {
         if((*itBul)->isAlive())
@@ -144,7 +151,7 @@ void BattleScreen::draw()
     m_state.draw(m_window);
 }
 
-void BattleScreen::respawnEnemy(float& p_time)
+void BattleScreen::respawnEnemy(float p_time)
 {
     uint16_t enType;
     static float respawnTimer = 0;
@@ -189,11 +196,6 @@ void BattleScreen::play()
     font.loadFromFile("Visitor Rus.ttf");
     m_state.setFont(font);
 
-    Texture map;//текстура карты
-    map.loadFromImage(m_map_image);//заряжаем текстуру картинкой
-    Sprite s_map;//создаём спрайт для карты
-    s_map.setTexture(map);//заливаем текстуру спрайтом
-
     Clock clock;
 
     for (int i = 0; i < ENEMY_COUNT;i++)
@@ -228,7 +230,9 @@ void BattleScreen::play()
                     m_player.revive();
                     m_player.setHealth(100);
                     m_playerScore = 0;
+                    m_state.setHealth(100);
                     m_state.setScore(m_playerScore);
+                    m_map.resetPosition();
                     m_window.clear();
                     while (!m_enemies.empty())
                     {
@@ -283,7 +287,6 @@ void BattleScreen::play()
             collisionCheck();
 
             m_window.clear(); // Внимание! Порядок отрисовки важен! Порядок отрисовки: Карта - Пули - Враги - Игрок
-            m_window.draw(s_map); // Рисуем фон
 
             draw();
 

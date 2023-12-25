@@ -11,6 +11,7 @@
 #include "entity.h"
 #include "enemy.h"
 #include "bullet.h"
+#include "map.h"
 
 using namespace sf;
 
@@ -30,16 +31,17 @@ private:
     std::array<Image, 3> m_enemyImage; // Массив изображений врагов
     std::array<Image, 4> m_bulletImage; // Массив изображений пуль
 
+    Map m_map;
     PlayerShip m_player;
     PlayerState m_state;
     std::list<Bullet*> m_enBullets; // Список вражеских пуль
     std::list<Bullet*> m_plBullets; // Список пуль игрока
     std::list<Enemy*> m_enemies; // Список пуль
 
-    void updateObjects(float& p_time);
+    void updateObjects(float p_time);
     void collisionCheck();
     void draw();
-    void respawnEnemy(float& p_time);
+    void respawnEnemy(float p_time);
 
 public:
     BattleScreen();
