@@ -8,6 +8,7 @@
 #include "enemy.h"
 #include "bullet.h"
 #include "battlescreen.h"
+#include "bonus.h"
 
 Font BattleScreen::createFont()
 {
@@ -20,10 +21,12 @@ Font BattleScreen::createFont()
 }
 
 
-void BattleScreen::updateObjects(float& p_time, PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets)
+void BattleScreen::updateObjects(float& p_time, PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies,
+                                 std::list<Bullet*>& p_enBullets, std::list<Bonus*> &bonuses)
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
+
     for (itBul = p_enBullets.begin(); itBul != p_enBullets.end(); itBul++) // Обновляем пули. Должно быть перед обновлением врагов
                                                                    // и игрока, так как они могут создать новые!
     {
@@ -47,9 +50,16 @@ void BattleScreen::updateObjects(float& p_time, PlayerShip& p_player, std::list<
         (*itEn)->move(p_time);
         (*itEn)->increaseShootTimer(p_time, p_enBullets);
     }
+
+    for(std::list<Bonus*>::iterator it = bonuses.begin(), end = bonuses.end(); it != end; ++it) // Обновляем бонусы
+    {
+        (*it)->update();
+        (*it)->move(p_time);
+    }
 }
 
-void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets)
+void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies,
+                                  std::list<Bullet*>& p_enBullets, std::list<Bonus*> &bonuses)
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
@@ -60,6 +70,14 @@ void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_pl
             p_player.getDamaged((*itBul)->getCollisionDamage());
             (*itBul)->die();
         }
+    }
+    for(std::list<Bonus*>::iterator it = bonuses.begin(), end = bonuses.end(); it != end; ++it) // Проверяем столкновение бонусов с игроком
+    {
+        if (p_player.getRect().intersects((*it)->getRect()))
+            {
+            p_player.addHealth((*it)->getValueHeal());
+            (*it)->die();
+            }
     }
 
     for(itBul = p_plBullets.begin(); itBul != p_plBullets.end(); itBul++) // Проверяем столкновение пуль с врагами
@@ -81,10 +99,26 @@ void BattleScreen::collisionCheck(PlayerShip& p_player, std::list<Bullet*>& p_pl
     }
 }
 
-void BattleScreen::draw(RenderWindow& p_window,PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies, std::list<Bullet*>& p_enBullets)
+void BattleScreen::draw(RenderWindow& p_window,PlayerShip& p_player, std::list<Bullet*>& p_plBullets, std::list<Enemy*>& p_enemies,
+                        std::list<Bullet*>& p_enBullets, std::list<Bonus*> &bonuses)
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
+
+    for(std::list<Bonus*>::iterator it = bonuses.begin(), end = bonuses.end(); it != end; ) // Обновляем бонусы
+    {
+        if ((*it)->isAlive())
+            {
+            p_window.draw(*((*it)->getSprite()));
+            ++it;
+            }
+        else
+            {
+            delete *it;
+            it = bonuses.erase(it);
+            }
+    }
+
     for(itBul = p_enBullets.begin(); itBul != p_enBullets.end(); itBul++) // Рисуем вражеские пули (удаляем если уничтожены)
     {
         if((*itBul)->isAlive())
@@ -155,6 +189,18 @@ void BattleScreen::respawnEnemy(float& p_time, std::list<Enemy*>& p_enemies, Ima
     }
 }
 
+void BattleScreen::spawnBonus(float p_time, std::list<Bonus*> &p_bonuses, Image &p_bonusImage)
+{
+    static double spawnTimer = 0;
+    spawnTimer+= p_time;
+    if (spawnTimer > 15000)    //бонусы падают примерно раз в 15 секунд
+        {
+        spawnTimer = 0;
+        p_bonuses.push_back(new Bonus(p_bonusImage, 19, 17, 0.1, 50));
+        }
+
+}
+
 void BattleScreen::play()
 {
 
@@ -175,6 +221,8 @@ void BattleScreen::play()
     enemyThreeBulletImage.loadFromFile("images/Enemy_3.png"); // загружаем изображение врага
     Image enemyStrongImage;
     enemyStrongImage.loadFromFile("images/Enemy_2.png"); // загружаем изображение врага
+    Image bonusesImage;
+    bonusesImage.loadFromFile("images/bullet.png"); // загружаем изображение бонуса
 
     Image bulletHeroImage;//изображение для пули
     bulletHeroImage.loadFromFile("images/Hero_bullet.png");//загрузили картинку в объект изображения
@@ -199,6 +247,8 @@ void BattleScreen::play()
     std::list<Bullet*> plBullets; // Список пуль игрока
 
     std::list<Enemy*> enemies; // Список пуль
+
+    std::list<Bonus*> bonuses; // Список бонусов
 
 
     enemies.push_back(new Enemy(enemyCommonImage, bulletCommonImage, ENEMY_W, ENEMY_H, "common"));
@@ -227,14 +277,16 @@ void BattleScreen::play()
         respawnEnemy(time, enemies, enemyCommonImage, enemyThreeBulletImage, enemyStrongImage,
                      bulletCommonImage, bulletThreeBulletImage, bulletStrongImage);
 
-        updateObjects(time, player, plBullets, enemies, enBullets);
+        spawnBonus(time, bonuses, bonusesImage);
 
-        collisionCheck(player, plBullets, enemies, enBullets);
+        updateObjects(time, player, plBullets, enemies, enBullets, bonuses);
+
+        collisionCheck(player, plBullets, enemies, enBullets, bonuses);
 
         window.clear(); // Внимание! Порядок отрисовки важен! Порядок отрисовки: Карта - Пули - Враги - Игрок
         window.draw(s_map); // Рисуем фон
 
-        draw(window, player, plBullets, enemies, enBullets);
+        draw(window, player, plBullets, enemies, enBullets, bonuses);
 
         window.display();
     }
