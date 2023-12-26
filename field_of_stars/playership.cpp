@@ -60,11 +60,3 @@ void PlayerShip::update()
         m_dx = 0;
     }
 }
-
-bool PlayerShip::getDamaged(uint16_t p_damage)
-{
-    std::cout << "Damage: " << p_damage << std::endl;
-    std::cout << "Health: " << getHealth()-p_damage << std::endl;
-    return Unit::getDamaged(p_damage);
-}
-

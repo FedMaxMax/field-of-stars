@@ -3,7 +3,7 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-CONFIG +=c++11
+CONFIG += c++11
 
 LIBS += -L"C:\Qt\SFML-2.3.2\lib"
 
@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     battlescreen.cpp\
     textwindow.cpp \
     playerstate.cpp \
-    map.cpp
+    map.cpp \
+    bonus.cpp
 
 include(deployment.pri)
 qtcAddDeployment()
@@ -39,5 +40,6 @@ HEADERS += \
     battlescreen.h\
     textwindow.h \
     playerstate.h \
-    map.h
+    map.h \
+    bonus.h
 
