@@ -12,14 +12,17 @@
 #include "battlescreen.h"
 #include "textwindow.h"
 #include "map.h"
+#include "bonus.h"
 
 BattleScreen::BattleScreen(): m_window {sf::VideoMode(SCREEN_W, SCREEN_H, sf::VideoMode::getDesktopMode().bitsPerPixel), "Field of stars"},
                               m_player{(float) ((SCREEN_W - PLAYER_W)/2), (float) (SCREEN_H - 10 - PLAYER_H), PLAYER_W, PLAYER_H},//объект класса игрока
                               m_state{0, 100} // Меню с информацией о здоровье и очках игрока
 {
     m_playerScore = 0;
+    m_bonusTimer = 0;
     m_map_image.loadFromFile("images/map.png");//загружаем файл для карты
     m_heroImage.loadFromFile("images/Hero_Sprite.png"); // загружаем изображение игрока
+    m_bonusImage.loadFromFile("images/Bullet.png");
     m_enemyImage[0].loadFromFile("images/Enemy_1_3.png"); // загружаем изображение врага
     m_enemyImage[1].loadFromFile("images/Enemy_2.png");
     m_enemyImage[2].loadFromFile("images/Enemy_3.png");
@@ -31,13 +34,13 @@ BattleScreen::BattleScreen(): m_window {sf::VideoMode(SCREEN_W, SCREEN_H, sf::Vi
     m_player.setImage(m_heroImage);
     m_player.setBulletImage(m_bulletImage[0]);
     m_map.setImage(m_map_image);
-
 }
 
 void BattleScreen::updateObjects(float p_time)
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
+    std::list<Bonus*>::iterator itBon;
 
     m_map.update(p_time);
 
@@ -64,12 +67,20 @@ void BattleScreen::updateObjects(float p_time)
         (*itEn)->move(p_time);
         (*itEn)->increaseShootTimer(p_time, m_enBullets);
     }
+
+    for(itBon = m_bonuses.begin(); itBon != m_bonuses.end(); itBon++) // Обновляем бонусы
+    {
+        (*itBon)->update();
+        (*itBon)->move(p_time);
+    }
 }
 
 void BattleScreen::collisionCheck()
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
+    std::list<Bonus*>::iterator itBon;
+
     for(itBul = m_enBullets.begin(); itBul != m_enBullets.end(); itBul++) // Проверяем столкновение пуль с игроком
     {
         if(m_player.getRect().intersects((*itBul)->getRect()))
@@ -77,6 +88,15 @@ void BattleScreen::collisionCheck()
             m_player.getDamaged((*itBul)->getCollisionDamage());
             m_state.setHealth(m_player.getHealth());
             (*itBul)->die();
+        }
+    }
+    for(itBon = m_bonuses.begin(); itBon != m_bonuses.end(); ++itBon) // Проверяем столкновение бонусов с игроком
+    {
+        if (m_player.getRect().intersects((*itBon)->getRect()))
+        {
+            m_player.addHealth((*itBon)->getRecovery());
+            m_state.setHealth(m_player.getHealth());
+            (*itBon)->die();
         }
     }
 
@@ -105,13 +125,26 @@ void BattleScreen::collisionCheck()
     }
 }
 
-
 void BattleScreen::draw()
 {
     std::list<Bullet*>::iterator itBul;
     std::list<Enemy*>::iterator itEn;
+    std::list<Bonus*>::iterator itBon;
 
     m_map.draw(m_window);
+
+    for(itBon = m_bonuses.begin(); itBon != m_bonuses.end(); itBon++) // Обновляем бонусы
+    {
+        if ((*itBon)->isAlive())
+        {
+            m_window.draw(*((*itBon)->getSprite()));
+        }
+        else
+        {
+            delete *itBon;
+            m_bonuses.erase(itBon);
+        }
+    }
 
     for(itBul = m_enBullets.begin(); itBul != m_enBullets.end(); itBul++) // Рисуем вражеские пули (удаляем если уничтожены)
     {
@@ -189,9 +222,21 @@ void BattleScreen::respawnEnemy(float p_time)
     }
 }
 
+void BattleScreen::spawnBonus(float p_time)
+{
+    m_bonusTimer+= p_time;
+    if (m_bonusTimer > 12000)  //бонусы падают примерно раз в 12 секунд
+    {
+        m_bonusTimer = 0;
+        m_bonuses.push_back(new Bonus(BONUS_W, BONUS_H, 0.1, 30));
+        m_bonuses.back()->setImage(m_bonusImage);
+    }
+}
+
 void BattleScreen::play()
 {
     srand(time(0));
+
     Font font;//шрифт
     font.loadFromFile("Visitor Rus.ttf");
     m_state.setFont(font);
@@ -205,6 +250,7 @@ void BattleScreen::play()
         m_enemies.back()->setBulletImage(m_bulletImage[1]);
     }
 
+
     while (m_window.isOpen())
     {
         float time = clock.getElapsedTime().asMicroseconds();
@@ -216,8 +262,8 @@ void BattleScreen::play()
         {
             m_window.clear();
 
-            TextWindow loseWindow{SCREEN_W/4-25, SCREEN_H/4, "         You lose\n Your score: " + std::to_string(m_playerScore) + "\n R         -  Repeat\n Esc     -  Quit Game",
-                        50, Color::Red, SCREEN_W/2+85, SCREEN_H/2 - 60, DARKBLUE};
+            TextWindow loseWindow{SCREEN_W/4-25, SCREEN_H/4, "         You lose\n Your score: " + std::to_string(m_playerScore)
+                        + "\n R         -  Repeat\n Esc     -  Quit Game", 50, Color::Red, SCREEN_W/2+85, SCREEN_H/2 - 60, DARKBLUE};
             loseWindow.setFont(font);
             loseWindow.draw(m_window);
             m_window.display();
@@ -230,10 +276,16 @@ void BattleScreen::play()
                     m_player.revive();
                     m_player.setHealth(100);
                     m_playerScore = 0;
+                    m_bonusTimer = 0;
                     m_state.setHealth(100);
                     m_state.setScore(m_playerScore);
                     m_map.resetPosition();
                     m_window.clear();
+                    while (!m_bonuses.empty())
+                    {
+                        delete m_bonuses.back();
+                        m_bonuses.pop_back();
+                    }
                     while (!m_enemies.empty())
                     {
                         delete m_enemies.back();
@@ -279,17 +331,19 @@ void BattleScreen::play()
                     clock.restart();
             }
 
-
             respawnEnemy(time);
+
+            spawnBonus(time);
 
             updateObjects(time);
 
             collisionCheck();
 
-            m_window.clear(); // Внимание! Порядок отрисовки важен! Порядок отрисовки: Карта - Пули - Враги - Игрок
+            m_window.clear();
 
             draw();
 
-            m_window.display();        }
+            m_window.display();
+        }
     }
 }

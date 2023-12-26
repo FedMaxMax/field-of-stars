@@ -18,6 +18,7 @@ class Unit : public Entity
 {
 private:
     uint16_t m_health;  // Здоровье объекта
+    uint16_t m_maxHealth;
 
 protected:
     Image m_bulletImage;
