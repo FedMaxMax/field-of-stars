@@ -22,7 +22,7 @@ BattleScreen::BattleScreen(): m_window {sf::VideoMode(SCREEN_W, SCREEN_H, sf::Vi
     m_bonusTimer = 0;
     m_map_image.loadFromFile("images/map.png");//загружаем файл для карты
     m_heroImage.loadFromFile("images/Hero_Sprite.png"); // загружаем изображение игрока
-    m_bonusImage.loadFromFile("images/Bullet.png");
+    m_bonusImage.loadFromFile("images/health_point.png");
     m_enemyImage[0].loadFromFile("images/Enemy_1_3.png"); // загружаем изображение врага
     m_enemyImage[1].loadFromFile("images/Enemy_2.png");
     m_enemyImage[2].loadFromFile("images/Enemy_3.png");

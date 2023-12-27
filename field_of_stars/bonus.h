@@ -4,8 +4,8 @@
 #include "entity.h"
 #include <stdint.h>
 
-const int BONUS_W = 16;
-const int BONUS_H = 16;
+const int BONUS_W = 32;
+const int BONUS_H = 32;
 
 class Bonus: public Entity
 {
