@@ -9,6 +9,7 @@ const int SCREEN_W = 800;
 const int SCREEN_H = 640;
 
 const sf::Color DARKBLUE{32, 9, 48};
+const sf::Color LIGHTRED{255, 179, 185};
 
 #endif // GLOBAL_H
 
