@@ -27,6 +27,10 @@ private:
     uint32_t m_playerScore; // счет игрока
     float m_bonusTimer;
 
+    uint16_t m_enemyCount;
+    float m_difficultyTimer;
+    uint64_t m_difficultyTrigger;
+
     RenderWindow m_window;
     Image m_map_image;
     Image m_heroImage;
@@ -47,6 +51,7 @@ private:
     void draw();
     void respawnEnemy(float p_time);
     void spawnBonus(float p_time);
+    void updateDifficulty(float p_time);
 public:
     BattleScreen();
     void play();
