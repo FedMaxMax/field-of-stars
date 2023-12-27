@@ -79,7 +79,7 @@ void Enemy::update()
 
         if (m_type == "threebullet")
             {
-            if ((m_x <= 10) || (m_x >= SCREEN_W - ENEMY_W - 10))
+            if ((m_x <= 0) || (m_x >= SCREEN_W - ENEMY_W))
                 {
                 m_dx = -m_dx;
                 }
