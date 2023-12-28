@@ -24,6 +24,7 @@ Enemy::Enemy(uint16_t p_w, uint16_t p_h, std::string p_type)
     {
         m_cost = 200;
         m_shootTime = 1800;
+        m_x = rand()%(SCREEN_W-ENEMY_W-20)+10;
         m_y = rand()%(SCREEN_H/3 - p_h) + 10;
         if (rand()%2)
         {
@@ -79,7 +80,7 @@ void Enemy::update()
 
         if (m_type == "threebullet")
         {
-            if ((m_x <= 0) || (m_x >= SCREEN_W - ENEMY_W))
+            if ((m_x < 0) || (m_x > SCREEN_W - ENEMY_W))
             {
                 m_dx = -m_dx;
             }
