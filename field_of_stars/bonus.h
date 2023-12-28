@@ -11,7 +11,7 @@ class Bonus: public Entity
 {
     uint16_t m_recovery;    //сколько здоровья прибавиться игроку
 public:
-    Bonus(uint16_t p_w, uint16_t p_h, float p_dy, uint16_t p_recovery);
+    Bonus(uint16_t p_w, uint16_t p_h, uint16_t p_recovery);
     void update();
     uint16_t getRecovery();
     void setRecovery(uint16_t p_recovery);

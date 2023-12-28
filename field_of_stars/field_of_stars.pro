@@ -21,7 +21,7 @@ SOURCES += main.cpp \
     bullet.cpp \
     unit.cpp \
     playership.cpp \
-    battlescreen.cpp\
+    battlescreen.cpp \
     textwindow.cpp \
     playerstate.cpp \
     map.cpp \
@@ -37,7 +37,7 @@ HEADERS += \
     global.h \
     unit.h \
     playership.h \
-    battlescreen.h\
+    battlescreen.h \
     textwindow.h \
     playerstate.h \
     map.h \

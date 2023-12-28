@@ -29,5 +29,6 @@ public:
     void update(); // Эта функция отвечает за изменение скорости и направления движения
                    // Определяет траекторию движения объекта
     uint16_t getCost();
+    bool getDamaged(uint16_t p_damage); // Получение урона
 };
 #endif // ENEMY_H

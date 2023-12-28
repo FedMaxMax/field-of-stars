@@ -30,6 +30,9 @@ BattleScreen::BattleScreen(): m_window {sf::VideoMode(SCREEN_W, SCREEN_H, sf::Vi
     m_bulletImage[1].loadFromFile("images/Enemy_bullet_1.png");
     m_bulletImage[2].loadFromFile("images/Enemy_bullet_2.png");
     m_bulletImage[3].loadFromFile("images/Enemy_bullet_3.png");
+    m_enemyCount = 3;
+    m_difficultyTimer = 0;
+    m_difficultyTrigger = 20000;    //20 секунд
 
     m_player.setImage(m_heroImage);
     m_player.setBulletImage(m_bulletImage[0]);
@@ -188,13 +191,13 @@ void BattleScreen::respawnEnemy(float p_time)
 {
     uint16_t enType;
     static float respawnTimer = 0;
-    if (m_enemies.size() < ENEMY_COUNT)
+    if (m_enemies.size() < m_enemyCount)
     {
         respawnTimer+= p_time;
         if(respawnTimer > 1000)
         {
             enType = rand() % 10 + 1;
-            if (enType <= 5)
+            if (enType <= 6)
                 {
                 m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
                 m_enemies.back()->setImage(m_enemyImage[0]);
@@ -202,7 +205,7 @@ void BattleScreen::respawnEnemy(float p_time)
                 respawnTimer = 0;
                 }
 
-            else if ((enType > 5) && (enType < 9))
+            else if ((enType > 6) && (enType < 9))
                 {
                 m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "threebullet"));
                 m_enemies.back()->setImage(m_enemyImage[1]);
@@ -228,9 +231,20 @@ void BattleScreen::spawnBonus(float p_time)
     if (m_bonusTimer > 12000)  //бонусы падают примерно раз в 12 секунд
     {
         m_bonusTimer = 0;
-        m_bonuses.push_back(new Bonus(BONUS_W, BONUS_H, 0.1, 30));
+        m_bonuses.push_back(new Bonus(BONUS_W, BONUS_H, 30));
         m_bonuses.back()->setImage(m_bonusImage);
     }
+}
+
+void BattleScreen::updateDifficulty(float p_time)
+{
+    m_difficultyTimer += p_time;
+    if (m_difficultyTimer > m_difficultyTrigger)
+        {
+        ++m_enemyCount;
+        m_difficultyTrigger += 20000;
+        m_difficultyTimer = 0;
+        }
 }
 
 void BattleScreen::play()
@@ -243,7 +257,7 @@ void BattleScreen::play()
 
     Clock clock;
 
-    for (int i = 0; i < ENEMY_COUNT;i++)
+    for (int i = 0; i < m_enemyCount;i++)
     {
         m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
         m_enemies.back()->setImage(m_enemyImage[0]);
@@ -279,6 +293,9 @@ void BattleScreen::play()
                     m_bonusTimer = 0;
                     m_state.setHealth(100);
                     m_state.setScore(m_playerScore);
+                    m_enemyCount = 3;
+                    m_difficultyTimer = 0;
+                    m_difficultyTrigger = 20000;
                     m_map.resetPosition();
                     m_window.clear();
                     while (!m_bonuses.empty())
@@ -302,7 +319,7 @@ void BattleScreen::play()
                         m_plBullets.pop_back();
 
                     }
-                    for (int i = 0; i < ENEMY_COUNT;i++)
+                    for (int i = 0; i < m_enemyCount;i++)
                     {
                         m_enemies.push_back(new Enemy(ENEMY_W, ENEMY_H, "common"));
                         m_enemies.back()->setImage(m_enemyImage[0]);
@@ -331,12 +348,10 @@ void BattleScreen::play()
                     clock.restart();
             }
 
+            updateDifficulty(time);
             respawnEnemy(time);
-
             spawnBonus(time);
-
             updateObjects(time);
-
             collisionCheck();
 
             m_window.clear();
