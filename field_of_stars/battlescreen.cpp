@@ -136,50 +136,54 @@ void BattleScreen::draw()
 
     m_map.draw(m_window);
 
-    for(itBon = m_bonuses.begin(); itBon != m_bonuses.end(); itBon++) // Обновляем бонусы
+    for(itBon = m_bonuses.begin(); itBon != m_bonuses.end(); ) // Обновляем бонусы
     {
         if ((*itBon)->isAlive())
         {
             m_window.draw(*((*itBon)->getSprite()));
+            ++itBon;
         }
         else
         {
             delete *itBon;
-            m_bonuses.erase(itBon);
+            itBon = m_bonuses.erase(itBon);
         }
     }
 
-    for(itBul = m_enBullets.begin(); itBul != m_enBullets.end(); itBul++) // Рисуем вражеские пули (удаляем если уничтожены)
+    for(itBul = m_enBullets.begin(); itBul != m_enBullets.end(); ) // Рисуем вражеские пули (удаляем если уничтожены)
     {
         if((*itBul)->isAlive())
         {
             m_window.draw(*((*itBul)->getSprite()));
+            ++itBul;
         } else {
             delete *itBul;
-            m_enBullets.erase(itBul);
+            itBul = m_enBullets.erase(itBul);
         }
     }
 
-    for(itBul = m_plBullets.begin(); itBul != m_plBullets.end(); itBul++) // Рисуем пули игрока (удаляем если уничтожены)
+    for(itBul = m_plBullets.begin(); itBul != m_plBullets.end(); ) // Рисуем пули игрока (удаляем если уничтожены)
     {
         if((*itBul)->isAlive())
         {
             m_window.draw(*((*itBul)->getSprite()));
+            ++itBul;
         } else {
             delete *itBul;
-            m_plBullets.erase(itBul);
+            itBul = m_plBullets.erase(itBul);
         }
 
     }
 
-    for(itEn = m_enemies.begin(); itEn != m_enemies.end(); itEn++) // Рисуем врагов (удаляем если уничтожены)
+    for(itEn = m_enemies.begin(); itEn != m_enemies.end(); ) // Рисуем врагов (удаляем если уничтожены)
     {
         if((*itEn)->isAlive())
         {
             m_window.draw(*((*itEn)->getSprite()));
+            ++itEn;
         } else {
             delete *itEn;
-            m_enemies.erase(itEn);
+            itEn = m_enemies.erase(itEn);
         }
     }
 
