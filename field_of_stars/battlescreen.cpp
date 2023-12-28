@@ -30,7 +30,7 @@ BattleScreen::BattleScreen(): m_window {sf::VideoMode(SCREEN_W, SCREEN_H, sf::Vi
     m_bulletImage[1].loadFromFile("images/Enemy_bullet_1.png");
     m_bulletImage[2].loadFromFile("images/Enemy_bullet_2.png");
     m_bulletImage[3].loadFromFile("images/Enemy_bullet_3.png");
-    m_enemyCount = 3;
+    m_enemyCount = 4;
     m_difficultyTimer = 0;
     m_difficultyTrigger = 20000;    //20 секунд
 
@@ -194,7 +194,7 @@ void BattleScreen::respawnEnemy(float p_time)
     if (m_enemies.size() < m_enemyCount)
     {
         respawnTimer+= p_time;
-        if(respawnTimer > 1000)
+        if(respawnTimer > 750)
         {
             enType = rand() % 10 + 1;
             if (enType <= 6)
@@ -293,7 +293,7 @@ void BattleScreen::play()
                     m_bonusTimer = 0;
                     m_state.setHealth(100);
                     m_state.setScore(m_playerScore);
-                    m_enemyCount = 3;
+                    m_enemyCount = 4;
                     m_difficultyTimer = 0;
                     m_difficultyTrigger = 20000;
                     m_map.resetPosition();
