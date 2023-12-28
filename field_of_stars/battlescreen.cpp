@@ -231,7 +231,7 @@ void BattleScreen::spawnBonus(float p_time)
     if (m_bonusTimer > 12000)  //бонусы падают примерно раз в 12 секунд
     {
         m_bonusTimer = 0;
-        m_bonuses.push_back(new Bonus(BONUS_W, BONUS_H, 0.1, 30));
+        m_bonuses.push_back(new Bonus(BONUS_W, BONUS_H, 30));
         m_bonuses.back()->setImage(m_bonusImage);
     }
 }
@@ -293,6 +293,9 @@ void BattleScreen::play()
                     m_bonusTimer = 0;
                     m_state.setHealth(100);
                     m_state.setScore(m_playerScore);
+                    m_enemyCount = 3;
+                    m_difficultyTimer = 0;
+                    m_difficultyTrigger = 20000;
                     m_map.resetPosition();
                     m_window.clear();
                     while (!m_bonuses.empty())
