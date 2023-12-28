@@ -21,9 +21,9 @@ public:
                uint32_t p_width,    //Ширина фона
                uint32_t p_height,   //Высота фона
                sf::Color p_colorBackground);//Цвет фона
-    void editTitle(std::string p_title);//Метод, изменяющий текст
+    void editTitle(std::string p_title);    //Метод, изменяющий текст
     void draw(sf::RenderWindow& p_window);  //Метод, выводящий фон и текст на экран
-    void setFont(sf::Font &p_font);
+    void setFont(sf::Font &p_font);         //Метод, задающий шрифт текста
 };
 
 #endif // TEXTWINDOW_H
